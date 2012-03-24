@@ -289,7 +289,8 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left, new Multiplication(dp->right, ar)).expand(ei);
 	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right), dp->left).expand(ei);
 	else {
-		list<ArithmeticExpression*> explist;
+		return new Division(al, ar);
+		/*list<ArithmeticExpression*> explist;
 		list<ArithmeticExpression*> reslist;
 		Addition *adl = dynamic_cast<Addition*>(al->formPolynom()), *adr = dynamic_cast<Addition*>(ar->formPolynom()), *nah = new Addition, *nal = new Addition, *adp;
 		reslist.push_front(new Division(nah, nal));
@@ -368,20 +369,14 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 					break;
 				}
 				mlp = dynamic_cast<Multiplication*>(adl->operands.front());
-				if (mlp->operands.size() == 1) {
-					nvp = dynamic_cast<NumericalValue*>(mlp->operands.front()); 
-					if (nvp) {
-						reslist.push_back(dp);
-						break;
-					}
-				}
 				elp = dynamic_cast<Exponentiation*>(mlp->operands.back());
+				if (elp->right 
 				reslist.push_back(new Multiplication(new Division(mlp->operands.front(), mrp->operands.front()), new Exponentiation(elp->left, new Subtraction(elp->right, erp->right))));
 				adl = dynamic_cast<Addition*>(Subtraction(adl, new Multiplication(reslist.back(), adr)).expand(ei)->formPolynom());
 			}
 		}
-		return Multiplication(reslist).expand(ei);
-	} //return new Division(al, ar); //poly else expo form
+		return Multiplication(reslist).expand(ei);*/
+	}
 }
 
 ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) const {
@@ -521,9 +516,7 @@ ArithmeticExpression* NumericalValue::formPolynom() const {
 }
 
 Multiplication *ArithmeticExpression::formMonom() const {
-	list<ArithmeticExpression*> tmpvec;
-	tmpvec.push_back(this->copy());
-	return new Multiplication(tmpvec);
+	return new Multiplication(new NumericalValue(1), copy());
 }
 
 Multiplication *Multiplication::formMonom() const {

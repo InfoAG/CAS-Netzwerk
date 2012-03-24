@@ -1,4 +1,4 @@
-#include "ArlecksCAS.h"
+#include "CAS.h"
 
 void Fehler(string meldung) {
 	cout << meldung << endl;

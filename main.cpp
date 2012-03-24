@@ -1,5 +1,4 @@
-#include "ArlecksCAS.h"
-#include <conio.h>
+#include "CAS.h"
 
 using namespace std;
 /*
@@ -7,6 +6,9 @@ ToDo:
 Vereifachen
 Klammersetzung
 Kovertierung binary, hex, okt, Einheiten?
+Netwerk
+LGS lösen
+Huffman
 */
 
 int main(int argc, char *argv[]) {
@@ -18,30 +20,12 @@ int main(int argc, char *argv[]) {
 	cout << "     #+#     #+#   #+#+# #+#       #+#    #+# #+#     #+# #+#    #+#" << endl;
 	cout << "########### ###    #### ###        ########  ###     ###  ########" << endl;
 	cout << endl << endl;
-	//cout << "\"help\" fuer Hilfe :D" << endl;
+	cout << "\"help\" fuer Hilfe :D" << endl;
 	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	//cout << "->help";
+	cout << endl;
 
 	string instr;
 	CAS mycas;
-	//int deletes = 0;
-	//char input;
-	//while ((input = _getch()) != '\r' && input != '\n') {
-	//	if (input == '\b') {
-	//		if (deletes < 4) {
-	//			cout.put('\b');
-	//			cout.put(' ');
-	//			cout.put('\b');
-	//			instr.erase(--(instr.end()));
-	//			deletes++;
-	//		}
-	//	} else {
-	//		instr += input;
-	//		deletes--;
-	//		cout.put(input);
-	//	}
-	//}
-	cout << endl;
 	for (;;) {
 		cout << "->";
 		getline(cin, instr);

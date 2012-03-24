@@ -179,6 +179,7 @@ struct NumericalValue : public ArithmeticExpression {
 	virtual ArithmeticExpression *copy() const { return new NumericalValue(*this); };
 	NumericalValue(string str) { value = strtod(str.c_str(), NULL); return; };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
+	virtual ArithmeticExpression* formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
 

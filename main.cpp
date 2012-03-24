@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
 		if (instr == "help") {
 			cout << endl;
 			cout << "Grundbefehle:" << endl;
-			cout << "->print ei.variables" << endl;
-			cout << "->print ei.functions" << endl;
-			cout << "->print ei.commands" << endl;
+			cout << "->print variables" << endl;
+			cout << "->print functions" << endl;
+			cout << "->print commands" << endl;
 			cout << endl;
 			cout << "Definitionen:" << endl;
 			cout << "->f(x,y):=x^sin(x)" << endl;
@@ -34,15 +34,14 @@ int main(int argc, char *argv[]) {
 			cout << "Loeschen:" << endl;
 			cout << "->delete variable $identifier" << endl;
 			cout << "->delete function $identifier" << endl;
-			cout << "->clear ei.variables" << endl;
-			cout << "->clear ei.functions" << endl;
+			cout << "->clear variables" << endl;
+			cout << "->clear functions" << endl;
 			cout << endl;
 			cout << "Ausdruecke auswerten:" << endl;
 			cout << "->integrate(x^2,x,0,1,100) (Funktion, Variable, untere Grenze, obere Grenze, Teilintervalle)" << endl;
 			cout << "->Grundrechenarten, sqrt(), log(), ln(), sin(), cos(), tan(), funktion(3,4)" << endl;
 			cout << "->$n steht fuer den Ausdruck des n-ten Kommandos" << endl;
-			cout << endl << endl;
-			cout << "TODO: vereinfachen, Klammersetzung (wird richtig interpretiert, aber nicht angezeigt), FEHLER FIXEN WENN EIKE NOERGELT" << endl;
+			cout << endl;
 			cout << endl;
 		} else if (instr == "quit") exit(0);
 		else if (instr == "print variables") {

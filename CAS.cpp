@@ -286,8 +286,8 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	Division *dp;
 	NumericalValue *nl = dynamic_cast<NumericalValue*>(al), *nr = dynamic_cast<NumericalValue*>(ar);
 	if (nl && nr) return new NumericalValue(nl->value / nr->value);
-	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left->expand(ei), new Multiplication(dp->right->expand(ei), ar)).expand(ei);
-	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right->expand(ei)), dp->left->expand(ei)).expand(ei);
+	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left, new Multiplication(dp->right, ar)).expand(ei);
+	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right), dp->left).expand(ei);
 	else {
 		list<ArithmeticExpression*> explist;
 		list<ArithmeticExpression*> reslist;

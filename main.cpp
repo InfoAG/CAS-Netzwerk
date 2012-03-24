@@ -1,15 +1,6 @@
 #include "CAS.h"
 
 using namespace std;
-/*
-ToDo:
-Vereifachen
-Klammersetzung
-Kovertierung binary, hex, okt, Einheiten?
-Netwerk
-LGS lösen
-Huffman
-*/
 
 int main(int argc, char *argv[]) {
 	cout << "      ::::::::::: ::::    ::: :::::::::: ::::::::      :::      :::::::: " << endl;

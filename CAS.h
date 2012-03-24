@@ -49,7 +49,7 @@ struct ArithmeticExpression {
 	virtual ArithmeticExpression *ln_func() { return new NaturalLogarithm(this); };
 	virtual ArithmeticExpression *sin_func() { return new Sinus(this); };
 	virtual ArithmeticExpression *cos_func() { return new Cosinus(this); };
-	virtual ArithmeticExpression *tan_func() { return new Tangent(this); };
+	virtual ArithmeticExpression *tan_func() { return new Tangent(this); }; 
 
 	friend ostream& operator << (ostream&, const ArithmeticExpression&);
 };

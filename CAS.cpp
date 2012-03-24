@@ -139,12 +139,12 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			Tokenize(strin.substr(10, strin.length() - 11), tokens, ","); //ALEX FUNCKOMMAS!!!!!!!
 			if (tokens.size() != 5 || ! IdentifierRec::runWith(tokens.at(1)) || ! DecimalRec::runWith(tokens.at(2)) || ! DecimalRec::runWith(tokens.at(3)) || ! DecimalRec::runWith(tokens.at(4))) throw "Ungueltiger (Teil-)Term"; //UND HIER AUCH
 			return new Integral(ArithmeticExpression::create(tokens.at(0)), new VariableExpression(tokens.at(1)), strtod(tokens.at(2).c_str(), NULL), strtod(tokens.at(3).c_str(), NULL), strtod(tokens.at(4).c_str(), NULL));
-		} else if (strin.front() == '$' && DecimalRec::runWith(strin.substr(1, strin.length() - 1))) { //!!!!!!ALEX GUCK HIER
+		} else if (strin.at(0) == '$' && DecimalRec::runWith(strin.substr(1, strin.length() - 1))) { //!!!!!!ALEX GUCK HIER
 			return new CommandExpression(atoi(strin.substr(1, strin.length() - 1).c_str()));		//!!!!!!!!! decimal, atoi
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
-			if (pos_leftparenth == string::npos || strin.back() != ')' || ! IdentifierRec::runWith(funcname)) throw "Ungueltiger (Teil-)Term";
+			if (pos_leftparenth == string::npos || strin.at(strin.length() - 1) != ')' || ! IdentifierRec::runWith(funcname)) throw "Ungueltiger (Teil-)Term";
 			string funcargs = strin.substr(pos_leftparenth + 1, strin.length() - pos_leftparenth - 2);
 			int pos_before = -1, pos_now = 0;
 			vector<ArithmeticExpression*> argvec;

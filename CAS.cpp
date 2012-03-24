@@ -158,6 +158,13 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 	}
 }
 
+ArithmeticExpression *ArithmeticExpression::sqrt_func() { return new SquareRoot(this); };
+ArithmeticExpression *ArithmeticExpression::log_func() { return new Logarithm(this); };
+ArithmeticExpression *ArithmeticExpression::ln_func() { return new NaturalLogarithm(this); };
+ArithmeticExpression *ArithmeticExpression::sin_func() { return new Sinus(this); };
+ArithmeticExpression *ArithmeticExpression::cos_func() { return new Cosinus(this); };
+ArithmeticExpression *ArithmeticExpression::tan_func() { return new Tangent(this); }; 
+
 ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 	list<ArithmeticExpression*> tmpvec;
 	Addition *nv;

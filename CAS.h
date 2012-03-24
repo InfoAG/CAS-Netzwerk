@@ -44,12 +44,12 @@ struct ArithmeticExpression {
 	virtual string getString() const = 0;
 	virtual bool isEqual(ArithmeticExpression *) const = 0;
 
-	virtual ArithmeticExpression *sqrt_func() { return new SquareRoot(this); };
-	virtual ArithmeticExpression *log_func() { return new Logarithm(this); };
-	virtual ArithmeticExpression *ln_func() { return new NaturalLogarithm(this); };
-	virtual ArithmeticExpression *sin_func() { return new Sinus(this); };
-	virtual ArithmeticExpression *cos_func() { return new Cosinus(this); };
-	virtual ArithmeticExpression *tan_func() { return new Tangent(this); }; 
+	virtual ArithmeticExpression *sqrt_func();
+	virtual ArithmeticExpression *log_func();
+	virtual ArithmeticExpression *ln_func();
+	virtual ArithmeticExpression *sin_func();
+	virtual ArithmeticExpression *cos_func();
+	virtual ArithmeticExpression *tan_func(); 
 
 	friend ostream& operator << (ostream&, const ArithmeticExpression&);
 };

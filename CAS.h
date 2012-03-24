@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 #include <list>
 #include <algorithm>
 

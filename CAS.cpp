@@ -685,7 +685,9 @@ ostream& operator<<(ostream& os, const Command& com) {
 };
 
 string CAS::process(string strin) {
+#ifdef _WIN32_
 	strin.erase(remove_if(strin.begin(), strin.end(), isspace), strin.end());
+#endif
 	size_t pos_assign = 0;
 	if ((pos_assign = strin.find(":=")) != string::npos) {
 		if (IdentifierRec::runWith(strin.substr(0, pos_assign))) {

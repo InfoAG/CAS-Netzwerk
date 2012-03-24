@@ -360,17 +360,24 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 			adr->operands.sort(polysort);
 			adl = dynamic_cast<Addition*>(dp->left);
 			adl->operands.sort(polysort);
+			mrp = dynamic_cast<Multiplication*>(adr->operands.front());
+			erp = dynamic_cast<Exponentiation*>(mrp->operands.back());
 			for (;;) {
-				if (adl->operands.size() == 1) {
-					nvp = dynamic_cast<NumericalValue*>(adl->operands.front());
-					if (nvp && nvp->value == 0) break;
+				if (adl->operands.size() == 0) {
+					reslist.push_back(dp);
+					break;
 				}
 				mlp = dynamic_cast<Multiplication*>(adl->operands.front());
-				mrp = dynamic_cast<Multiplication*>(adr->operands.front());
+				if (mlp->operands.size() == 1) {
+					nvp = dynamic_cast<NumericalValue*>(mlp->operands.front()); 
+					if (nvp) {
+						reslist.push_back(dp);
+						break;
+					}
+				}
 				elp = dynamic_cast<Exponentiation*>(mlp->operands.back());
-				erp = dynamic_cast<Exponentiation*>(mrp->operands.back());
 				reslist.push_back(new Multiplication(new Division(mlp->operands.front(), mrp->operands.front()), new Exponentiation(elp->left, new Subtraction(elp->right, erp->right))));
-				adl = dynamic_cast<Addition*>(Subtraction(adl, new Multiplication(reslist.back(), adr)).expand(ei));
+				adl = dynamic_cast<Addition*>(Subtraction(adl, new Multiplication(reslist.back(), adr)).expand(ei)->formPolynom());
 			}
 		}
 		return Multiplication(reslist).expand(ei);
@@ -507,8 +514,16 @@ ArithmeticExpression* Exponentiation::formPolynom() const {
 	return new Addition(tmpvec);
 }
 
+ArithmeticExpression* NumericalValue::formPolynom() const {
+	list<ArithmeticExpression*> tmpvec;
+	tmpvec.push_back(formMonom());
+	return new Addition(tmpvec);
+}
+
 Multiplication *ArithmeticExpression::formMonom() const {
-	return new Multiplication(new NumericalValue(1), this->copy());
+	list<ArithmeticExpression*> tmpvec;
+	tmpvec.push_back(this->copy());
+	return new Multiplication(tmpvec);
 }
 
 Multiplication *Multiplication::formMonom() const {
@@ -685,7 +700,7 @@ ostream& operator<<(ostream& os, const Command& com) {
 };
 
 string CAS::process(string strin) {
-#ifdef _WIN32_
+#if defined (_WIN32)
 	strin.erase(remove_if(strin.begin(), strin.end(), isspace), strin.end());
 #endif
 	size_t pos_assign = 0;

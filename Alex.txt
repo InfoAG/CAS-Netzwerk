@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Alex stinktt
+=======
+Alex stink
+>>>>>>> 8235181a9bcbf5ce83d1fbe15c2f5792c22d6526
 tttttttttttttteeeeeeeeeeeeessssssssstttttt
 
 

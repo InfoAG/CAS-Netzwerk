@@ -8,23 +8,33 @@
 
 using namespace std;
 
-void Fehler(string);
-
-//enum knotentyp { ADDITION, SUBTRAKTION, MULTIPLIKATION, DIVISION, POTENZ, WURZEL, LOG, LN, SINUS, COSINUS, TANGENS, NUMBER, VAR, FUNCTION };
-
-class Exponentiation;
+struct ArithmeticExpression;
+struct UnaryOperation;
+struct BinaryOperation;
+struct LevelingOperation;
+struct Addition;
+struct Subtraction;
+struct Multiplication;
+struct Division;
+struct Exponentiation;
+struct SquareRoot;
+struct Logarithm;
+struct NaturalLogarithm;
+struct Sinus;
+struct Cosinus;
+struct Tangent;
+struct NumericalValue;
+struct VariableExpression;
+struct CommandExpression;
+struct FunctionExpression;
+struct Integral;
 struct Variable;
 struct Function;
 struct Command;
 struct CASInformation;
 struct ExpansionInformation;
-class CAS;
-class Multiplication;
 
-class ArithmeticExpression {
-public:
-
-	//ArithmeticExpression();
+struct ArithmeticExpression {
 	static ArithmeticExpression *create(string);
 	virtual ArithmeticExpression *copy() const = 0;
 
@@ -33,35 +43,16 @@ public:
 	virtual Multiplication *formMonom() const;
 	virtual string getString() const = 0;
 	virtual bool isEqual(ArithmeticExpression *) const = 0;
-	//virtual double getVal() { return 0; };
-	//virtual bool containsVariable(string) const = 0;
-	//virtual bool containsFunction(string) const = 0;
 
-	//virtual ArithmeticExpression *add(ArithmeticExpression*);
-	//virtual ArithmeticExpression *subtract(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *multiply(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *divide(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *power(ArithmeticExpression *r);
-	virtual ArithmeticExpression *sqrt_func();
-	virtual ArithmeticExpression *log_func();
-	virtual ArithmeticExpression *ln_func();
-	virtual ArithmeticExpression *sin_func();
-	virtual ArithmeticExpression *cos_func();
-	virtual ArithmeticExpression *tan_func();
+	virtual ArithmeticExpression *sqrt_func() { return new SquareRoot(this); };
+	virtual ArithmeticExpression *log_func() { return new Logarithm(this); };
+	virtual ArithmeticExpression *ln_func() { return new NaturalLogarithm(this); };
+	virtual ArithmeticExpression *sin_func() { return new Sinus(this); };
+	virtual ArithmeticExpression *cos_func() { return new Cosinus(this); };
+	virtual ArithmeticExpression *tan_func() { return new Tangent(this); };
 
 	friend ostream& operator << (ostream&, const ArithmeticExpression&);
 };
-
-//class ArithmeticExpression {
-//public:
-//
-//	ArithmeticExpression(string);
-//
-//	ArithmeticExpression expand(const ExpansionInformation&) const;
-//	string getString() const;
-//
-//	friend ostream& operator << (ostream&, const ArithmeticExpression&);
-//};
 
 struct UnaryOperation : public ArithmeticExpression {
 	ArithmeticExpression *operand;
@@ -69,11 +60,8 @@ struct UnaryOperation : public ArithmeticExpression {
 	UnaryOperation(ArithmeticExpression *o) : operand(o) {};
 	virtual ArithmeticExpression *copy() const = 0;
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const = 0;
-	//virtual ArithmeticExpression *formPolynom() const = 0;
 	virtual string getString() const = 0;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual inline bool containsVariable(string id) const { return operand->containsVariable(id); };
-	//virtual inline bool containsFunction(string id) const { return operand->containsFunction(id); };
 };
 
 struct BinaryOperation : public ArithmeticExpression {
@@ -83,11 +71,8 @@ struct BinaryOperation : public ArithmeticExpression {
 	BinaryOperation(ArithmeticExpression *l, ArithmeticExpression *r) : left(l), right(r) {};
 	virtual ArithmeticExpression *copy() const = 0;
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const = 0;
-	//virtual ArithmeticExpression *formPolynom() const = 0;
 	virtual string getString() const = 0;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual inline bool containsVariable(string id) const { return (left->containsVariable(id) || right->containsVariable(id)); };
-	//virtual inline bool containsFunction(string id) const { return (left->containsFunction(id) || right->containsFunction(id)); };
 };
 
 struct LevelingOperation : public ArithmeticExpression {
@@ -103,8 +88,7 @@ struct LevelingOperation : public ArithmeticExpression {
 	virtual bool isEqual(ArithmeticExpression *) const;
 };
 
-class Addition : public LevelingOperation {
-public:
+struct Addition : public LevelingOperation {
 	Addition() {};
 	virtual ArithmeticExpression *copy() const { return new Addition(*this); };
 	Addition(const list<ArithmeticExpression*>& va) : LevelingOperation(va) {}; 
@@ -113,18 +97,14 @@ public:
 	virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Subtraction : public BinaryOperation {
-public:
+struct Subtraction : public BinaryOperation {
 	Subtraction(ArithmeticExpression *l, ArithmeticExpression *r) : BinaryOperation(l, r) {};
 	virtual ArithmeticExpression *copy() const { return new Subtraction(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Multiplication : public LevelingOperation {
-private:
+struct Multiplication : public LevelingOperation {
 	void addexp(ArithmeticExpression*, ArithmeticExpression*, vector<Exponentiation*>&) const;
-public:
 	Multiplication(const list<ArithmeticExpression*>& va) : LevelingOperation(va) {};
 	virtual ArithmeticExpression *copy() const { return new Multiplication(*this); };
 	Multiplication(ArithmeticExpression *l, ArithmeticExpression *r) : LevelingOperation(l, r) {};
@@ -133,142 +113,115 @@ public:
 	virtual Multiplication *formMonom() const;
 	virtual string getString() const;
 };
-class Division : public BinaryOperation {
-public:
+struct Division : public BinaryOperation {
+
 	Division(ArithmeticExpression *l, ArithmeticExpression *r) : BinaryOperation(l, r) {};
 	virtual ArithmeticExpression *copy() const { return new Division(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Exponentiation : public BinaryOperation {
-public:
+struct Exponentiation : public BinaryOperation {
+
 	Exponentiation(ArithmeticExpression *l, ArithmeticExpression *r) : BinaryOperation(l, r) {};
 	virtual ArithmeticExpression *copy() const { return new Exponentiation(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
 	virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class SquareRoot : public UnaryOperation {
-public:
+struct SquareRoot : public UnaryOperation {
+
 	SquareRoot(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new SquareRoot(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Logarithm : public UnaryOperation {
-public:
+struct Logarithm : public UnaryOperation {
+
 	Logarithm(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new Logarithm(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class NaturalLogarithm : public UnaryOperation {
-public:
+struct NaturalLogarithm : public UnaryOperation {
+
 	NaturalLogarithm(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new NaturalLogarithm(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Sinus : public UnaryOperation {
-public:
+struct Sinus : public UnaryOperation {
+
 	Sinus(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new Sinus(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Cosinus : public UnaryOperation {
-public:
+struct Cosinus : public UnaryOperation {
+
 	Cosinus(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new Cosinus(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
-class Tangent : public UnaryOperation {
-public:
+struct Tangent : public UnaryOperation {
+
 	Tangent(ArithmeticExpression *o) : UnaryOperation(o) {};
 	virtual ArithmeticExpression *copy() const { return new Tangent(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 };
 
-class NumericalValue : public ArithmeticExpression {
-public:
+struct NumericalValue : public ArithmeticExpression {
 	double value;
+	
 	NumericalValue(double d) : value(d) {};
 	virtual ArithmeticExpression *copy() const { return new NumericalValue(*this); };
 	NumericalValue(string str) { value = strtod(str.c_str(), NULL); return; };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual inline bool containsVariable(string id) const { return false; };
-	//virtual inline bool containsFunction(string id) const { return false; };
 
-	//virtual ArithmeticExpression *add(ArithmeticExpression*);
-	//virtual ArithmeticExpression *subtract(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *multiply(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *divide(ArithmeticExpression *r);
-	//virtual ArithmeticExpression *power(ArithmeticExpression *r);
-	virtual ArithmeticExpression *sqrt_func();
-	virtual ArithmeticExpression *log_func();
-	virtual ArithmeticExpression *ln_func();
-	virtual ArithmeticExpression *sin_func();
-	virtual ArithmeticExpression *cos_func();
-	virtual ArithmeticExpression *tan_func();
+	virtual ArithmeticExpression *sqrt_func() { return new NumericalValue(sqrt(value)); }
+	virtual ArithmeticExpression *log_func() { return new NumericalValue(sqrt(value)); }
+	virtual ArithmeticExpression *ln_func() { return new NumericalValue(sqrt(value)); }
+	virtual ArithmeticExpression *sin_func() { return new NumericalValue(sqrt(value)); }
+	virtual ArithmeticExpression *cos_func() { return new NumericalValue(sqrt(value)); }
+	virtual ArithmeticExpression *tan_func() { return new NumericalValue(sqrt(value)); }
 };
 
-class VariableExpression : public ArithmeticExpression {
-private:
+struct VariableExpression : public ArithmeticExpression {
 	string identifier;
-public:
+
 	VariableExpression(const string& i) : identifier(i) {};
 	virtual ArithmeticExpression *copy() const { return new VariableExpression(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual inline bool containsVariable(string id) const { return (identifier == id); };
-	//virtual inline bool containsFunction(string id) const { return false; };
 };
 
-class CommandExpression : public ArithmeticExpression {
-private:
+struct CommandExpression : public ArithmeticExpression {
+
 	int id;
-public:
+
 	CommandExpression(int i) : id(i) {};
 	virtual ArithmeticExpression *copy() const { return new CommandExpression(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const ;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual inline bool containsVariable(string id) const;
-	//virtual inline bool containsFunction(string id) const;
 };
 
-class FunctionExpression : public ArithmeticExpression {
-private:
+struct FunctionExpression : public ArithmeticExpression {
 	string identifier;
 	vector<ArithmeticExpression*> argvec;
-public:
+
 	FunctionExpression(const string& i, const vector<ArithmeticExpression*>& av) : identifier(i), argvec(av) {};
 	virtual ArithmeticExpression *copy() const { return new FunctionExpression(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
-	//virtual bool containsVariable(string id) const;
-	//virtual bool containsFunction(string id) const { return (identifier == id); };
 };
 
-class Integral : public ArithmeticExpression {
-public:
+struct Integral : public ArithmeticExpression {
 	ArithmeticExpression *aexp;
 	VariableExpression *var;
 	double lower_bound;
@@ -278,7 +231,6 @@ public:
 	Integral(ArithmeticExpression *ax, VariableExpression *v, double lb, double ub, int iv) : aexp(ax), var(v), lower_bound(lb), upper_bound(ub), intervals(iv) {};
 	virtual ArithmeticExpression *copy() const { return new Integral(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-	//virtual ArithmeticExpression *formPolynom() const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression *) const;
 };
@@ -300,6 +252,7 @@ struct Function {
 	bool expanded;
 
 	Function(const string& i, vector<string>& fargs, ArithmeticExpression *ax) : identifier(i), func_args(fargs), aexp(ax), expanded(false) {};
+
 	friend ostream& operator<<(ostream&, const Function&);
 };
 
@@ -308,6 +261,7 @@ struct Command {
 	bool expanded;
 
 	Command(ArithmeticExpression *ax) : aexp(ax), expanded(false) {};
+
 	friend ostream& operator<<(ostream&, const Command&);
 };
 

@@ -1,11 +1,5 @@
 #include "CAS.h"
 
-void Fehler(string meldung) {
-	cout << meldung << endl;
-	system("PAUSE");
-	exit(0);
-}
-
 string dtostr(double d) {
 	stringstream ss;
 	ss << d;
@@ -60,54 +54,6 @@ void Tokenize(const string& str, vector<string>& tokens, const string& delimiter
         // Find next "non-delimiter"
         pos = str.find_first_of(delimiters, lastPos);
     }
-}
-
-ArithmeticExpression *ArithmeticExpression::sqrt_func() {
-	return new SquareRoot(this);
-}
-
-ArithmeticExpression *ArithmeticExpression::log_func() {
-	return new Logarithm(this);
-}
-
-ArithmeticExpression *ArithmeticExpression::ln_func() {
-	return new NaturalLogarithm(this);
-}
-
-ArithmeticExpression *ArithmeticExpression::sin_func() {
-	return new Sinus(this);
-}
-
-ArithmeticExpression *ArithmeticExpression::cos_func() {
-	return new Cosinus(this);
-}
-
-ArithmeticExpression *ArithmeticExpression::tan_func() {
-	return new Tangent(this);
-}
-
-ArithmeticExpression *NumericalValue::sqrt_func() {
-	return new NumericalValue(sqrt(value));
-}
-
-ArithmeticExpression *NumericalValue::log_func() {
-	return new NumericalValue(log10(value));
-}
-
-ArithmeticExpression *NumericalValue::ln_func() {
-	return new NumericalValue(log(value));
-}
-
-ArithmeticExpression *NumericalValue::sin_func() {
-	return new NumericalValue(sin(value));
-}
-
-ArithmeticExpression *NumericalValue::cos_func() {
-	return new NumericalValue(cos(value));
-}
-
-ArithmeticExpression *NumericalValue::tan_func() {
-	return new NumericalValue(tan(value));
 }
 
 ArithmeticExpression *ArithmeticExpression::create(string strin) {
@@ -213,12 +159,6 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 }
 
 ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
-	//ArithmeticExpression *al = left->expand(ei);
-	//ArithmeticExpression *ar = right->expand(ei);
-	//NumericalValue *nl = dynamic_cast<NumericalValue*>(al);
-	//NumericalValue *nr = dynamic_cast<NumericalValue*>(ar);
-	//if (nl && nr) return new NumericalValue(nl->value + nr->value);
-	//else return new Addition(al, ar);
 	list<ArithmeticExpression*> tmpvec;
 	Addition *nv;
 	ArithmeticExpression *ax;
@@ -227,19 +167,7 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 		if (nv = dynamic_cast<Addition*>(ax)) tmpvec.insert(tmpvec.begin(), nv->operands.begin(), nv->operands.end());
 		else tmpvec.push_back(ax);
 	}
-	//Multiplication *mult, *mult_in;
-	//for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end(); ++it) {
-	//	for (list<ArithmeticExpression*>::iterator it_in = tmpvec.begin(); it_in != tmpvec.end();) {
-	//		if (it != it_in) {
-	//			mult = dynamic_cast<Multiplication*>(*it);
-	//			mult_in = dynamic_cast<Multiplication*>(*it_in);
-	//			if (mult->left == mult_in->left) {
-	//				mult->right = new Addition(mult->right, mult_in->right);
-	//				it_in = tmpvec.erase(it_in);
-	//			} else ++it_in;
-	//		} else ++it_in;
-	//	}
-	//}
+
 	NumericalValue *np;
 	double dbuf = 0;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
@@ -273,12 +201,6 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 }
 
 ArithmeticExpression *Subtraction::expand(const ExpansionInformation& ei) const {
-	//ArithmeticExpression *al = left->expand(ei);
-	//ArithmeticExpression *ar = right->expand(ei);
-	//NumericalValue *nl = dynamic_cast<NumericalValue*>(al);
-	//NumericalValue *nr = dynamic_cast<NumericalValue*>(ar);
-	//if (nl && nr) return new NumericalValue(nl->value - nr->value);
-	//else return new Subtraction(al, ar);
 	return Addition(left, new Multiplication(new NumericalValue(-1), right)).expand(ei);
 }
 
@@ -294,12 +216,6 @@ void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *po
 }
 
 ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) const {
-	//ArithmeticExpression *al = left->expand(ei);
-	//ArithmeticExpression *ar = right->expand(ei);
-	//NumericalValue *nl = dynamic_cast<NumericalValue*>(al);
-	//NumericalValue *nr = dynamic_cast<NumericalValue*>(ar);
-	//if (nl && nr) return new NumericalValue(nl->value * nr->value);
-	//else return new Multiplication(al, ar);
 	list<ArithmeticExpression*> tmpvec;
 	Multiplication *nv;
 	ArithmeticExpression *ax;
@@ -360,10 +276,6 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	ArithmeticExpression *al = left->expand(ei);
 	ArithmeticExpression *ar = right->expand(ei);
-	//NumericalValue *nl = dynamic_cast<NumericalValue*>(al);
-	//NumericalValue *nr = dynamic_cast<NumericalValue*>(ar);
-	//if (nl && nr) return new NumericalValue(nl->value / nr->value);
-	//else return new Division(al, ar);
 	Division *dp;
 	NumericalValue *nl = dynamic_cast<NumericalValue*>(al), *nr = dynamic_cast<NumericalValue*>(ar);
 	if (nl && nr) return new NumericalValue(nl->value / nr->value);
@@ -471,22 +383,6 @@ ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) con
 	return new Exponentiation(al, ar);
 }
 
-//ArithmeticExpression *Subtraction::expand(const ExpansionInformation& ei) const {
-//	return left->expand(ei)->subtract(right->expand(ei));
-//}
-//
-//ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) const {
-//	return left->expand(ei)->multiply(right->expand(ei));
-//}
-//
-//ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
-//	return left->expand(ei)->divide(right->expand(ei));
-//}
-//
-//ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) const {
-//	return left->expand(ei)->power(right->expand(ei));
-//}
-
 ArithmeticExpression *SquareRoot::expand(const ExpansionInformation& ei) const {
 	return operand->expand(ei)->sqrt_func();
 }
@@ -583,10 +479,6 @@ ArithmeticExpression* Addition::formPolynom() const {
 	return new Addition(newlist);
 }
 
-//ArithmeticExpression* Subtraction::formPolynom() const {
-//	return new Subtraction(*this);
-//}
-
 ArithmeticExpression* Multiplication::formPolynom() const {
 	Exponentiation *ep;
 	NumericalValue *np;
@@ -602,60 +494,11 @@ ArithmeticExpression* Multiplication::formPolynom() const {
 	return new Addition(adlist);
 }
 
-//ArithmeticExpression* Division::formPolynom() const {
-//	return new Division(*this);
-//}
-
 ArithmeticExpression* Exponentiation::formPolynom() const {
 	list<ArithmeticExpression*> tmpvec;
 	tmpvec.push_back(new Multiplication(new NumericalValue(1), new Exponentiation(*this)));
 	return new Addition(tmpvec);
 }
-
-//ArithmeticExpression* SquareRoot::formPolynom() const {
-//	list<ArithmeticExpression*> tmpvec;
-//	tmpvec.push_back(new Multiplication(new NumericalValue(1), new Exponentiation(this->operand, new NumericalValue(0.5))));
-//	return new Addition(tmpvec);
-//}
-
-//ArithmeticExpression* Logarithm::formPolynom() const {
-//	return new Logarithm(*this);
-//}
-//
-//ArithmeticExpression* NaturalLogarithm::formPolynom() const {
-//	return new NaturalLogarithm(*this);
-//}
-//
-//ArithmeticExpression* Sinus::formPolynom() const {
-//	return new Sinus(*this);
-//}
-//
-//ArithmeticExpression* Cosinus::formPolynom() const {
-//	return new Cosinus(*this);
-//}
-//
-//ArithmeticExpression* Tangent::formPolynom() const {
-//	return new Tangent(*this);
-//}
-//ArithmeticExpression* NumericalValue::formPolynom() const {
-//	return new NumericalValue(*this);
-//}
-//
-//ArithmeticExpression* VariableExpression::formPolynom() const {
-//	return new VariableExpression(*this);
-//}
-//
-//ArithmeticExpression* FunctionExpression::formPolynom() const {
-//	return new FunctionExpression(*this);
-//}
-//
-//ArithmeticExpression* CommandExpression::formPolynom() const {
-//	return new CommandExpression(*this);
-//}
-//
-//ArithmeticExpression* Integral::formPolynom() const {
-//	return new Integral(*this);
-//}
 
 Multiplication *ArithmeticExpression::formMonom() const {
 	return new Multiplication(new NumericalValue(1), this->copy());
@@ -668,19 +511,9 @@ Multiplication *Multiplication::formMonom() const {
 string CommandExpression::getString() const {
 	return "$" + id;
 }
-//virtual inline bool containsVariable(string id) const;
-//virtual inline bool containsFunction(string id) const; 
 
 string Addition::getString() const {
 	string str;
-	//if (operands.size() > 1) {
-	//	list<ArithmeticExpression*>::const_iterator cit;
-	//	for (list<ArithmeticExpression*>::const_iterator it = operands.begin();; ++it) {
-	//		cit = it;
-	//		if (++cit == operands.end()) { break; }
-	//		else str += (*it)->getString() + '+';
-	//	}
-	//}
 	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != --(operands.end()); ++it)
 			str += (*it)->getString() + '+';
 	str += operands.back()->getString();
@@ -693,12 +526,6 @@ string Subtraction::getString() const {
 
 string Multiplication::getString() const {
 	string str;
-		/*list<ArithmeticExpression*>::const_iterator cit;
-		for (list<ArithmeticExpression*>::const_iterator it = operands.begin();; ++it) {
-			cit = it;
-			if (++cit == operands.end()) { break; }
-			else str += (*it)->getString() + '*';
-		}*/
 	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != --(operands.end()); ++it)
 			str += (*it)->getString() + '*';
 	str += operands.back()->getString();
@@ -806,23 +633,6 @@ ostream& operator << (ostream& os, const ArithmeticExpression& kt) {
 	return os;
 }
 
-//ArithmeticExpression::ArithmeticExpression(string strin) {
-//	ursprung = new ArithmeticExpression(strin);
-//}
-//
-//ArithmeticExpression ArithmeticExpression::expand(const ExpansionInformation& ei) const {
-//	return ursprung->expand(ei);
-//}
-//
-//string ArithmeticExpression::getString() const {
-//	return ursprung->getString();
-//}
-//
-//ostream& operator << (ostream& os, const ArithmeticExpression& aexp) {
-//	os << *(aexp.ursprung);
-//	return os;
-//}
-
 ArithmeticExpression *FunctionExpression::expand(const ExpansionInformation& ei) const {
 	vector<Function>::const_iterator it_func = ei.functions.begin();
 	for (; it_func != ei.functions.end(); ++it_func)
@@ -916,7 +726,7 @@ string CAS::process(string strin) {
 		casinfo.commands.push_back(tmpex);
 		return tmpex->expand(casinfo)->getString();
 	}
-};
+}
 
 void CAS::deleteVariable(string i) {
 	for (vector<Variable>::iterator it = casinfo.variables.begin(); it != casinfo.variables.end(); ++it) {

@@ -203,7 +203,7 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 		}
 	}
 	for (list<Multiplication*>::iterator it = monlist.begin(); it != monlist.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei));
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands)));
 	return new Addition(tmpvec);
 }
 
@@ -260,7 +260,7 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 	} 
 	tmpvec.clear();
 	for (vector<Exponentiation*>::iterator it = exvec.begin(); it != exvec.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei)); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
@@ -672,25 +672,37 @@ ArithmeticExpression *FunctionExpression::expand(const ExpansionInformation& ei)
 	return it_func->aexp->expand(ExpansionInformation(ei.variables, cfunc, ei.commands, copyvars));
 }
 
+string Variable::getString() const {
+	return identifier + "=" + aexp->getString();
+}
+
+string Function::getString() const {
+	string out = identifier + "(";
+	for (vector<string>::const_iterator it = func_args.begin(); it != func_args.end(); ++it) {
+		if (it != func_args.begin()) out += ",";
+		out += (*it);
+	}
+	return out + ")=" + aexp->getString();
+}
+
+string Command::getString() const {
+	return aexp->getString();
+}
+
 ostream& operator<<(ostream& os, const Variable& var) {
-	os << var.identifier << "=" << *(var.aexp);
+	os << var.getString();
 	return os;
-};
+}
 
 ostream& operator<<(ostream& os, const Function& func) {
-	os << func.identifier << "(";
-	for (vector<string>::const_iterator it = func.func_args.begin(); it != func.func_args.end(); ++it) {
-		if (it != func.func_args.begin()) os << ",";
-		os << (*it);
-	}
-	os << ")=" << *(func.aexp);
+	os << func.getString();
 	return os;
-};
+}
 
 ostream& operator<<(ostream& os, const Command& com) {
-	os << *(com.aexp);
+	os << com.getString();
 	return os;
-};
+}
 
 string CAS::process(string strin) {
 #if defined (_WIN32)

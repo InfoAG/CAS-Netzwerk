@@ -243,6 +243,7 @@ struct Variable {
 	bool expanded;
 
 	Variable(const string& n, ArithmeticExpression *ax) : identifier(n), aexp(ax), expanded(false) {};
+	string getString() const;
 
 	friend ostream& operator<<(ostream&, const Variable&);
 };
@@ -254,6 +255,7 @@ struct Function {
 	bool expanded;
 
 	Function(const string& i, vector<string>& fargs, ArithmeticExpression *ax) : identifier(i), func_args(fargs), aexp(ax), expanded(false) {};
+	string getString() const;
 
 	friend ostream& operator<<(ostream&, const Function&);
 };
@@ -263,6 +265,7 @@ struct Command {
 	bool expanded;
 
 	Command(ArithmeticExpression *ax) : aexp(ax), expanded(false) {};
+	string getString() const;
 
 	friend ostream& operator<<(ostream&, const Command&);
 };

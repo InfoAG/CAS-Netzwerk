@@ -676,23 +676,31 @@ string Variable::getString() const {
 	return identifier + "=" + aexp->getString();
 }
 
+string Function::getString() const {
+	string out = identifier + "(";
+	for (vector<string>::const_iterator it = func_args.begin(); it != func_args.end(); ++it) {
+		if (it != func_args.begin()) out += ",";
+		out += (*it);
+	}
+	return out + ")=" + aexp->getString();
+}
+
+string Command::getString() const {
+	return aexp->getString();
+}
+
 ostream& operator<<(ostream& os, const Variable& var) {
 	os << var.getString();
 	return os;
 }
 
 ostream& operator<<(ostream& os, const Function& func) {
-	os << func.identifier << "(";
-	for (vector<string>::const_iterator it = func.func_args.begin(); it != func.func_args.end(); ++it) {
-		if (it != func.func_args.begin()) os << ",";
-		os << (*it);
-	}
-	os << ")=" << *(func.aexp);
+	os << func.getString();
 	return os;
 }
 
 ostream& operator<<(ostream& os, const Command& com) {
-	os << *(com.aexp);
+	os << com.getString();
 	return os;
 }
 

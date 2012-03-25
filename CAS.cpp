@@ -672,10 +672,14 @@ ArithmeticExpression *FunctionExpression::expand(const ExpansionInformation& ei)
 	return it_func->aexp->expand(ExpansionInformation(ei.variables, cfunc, ei.commands, copyvars));
 }
 
+string Variable::getString() const {
+	return identifier + "=" + aexp->getString();
+}
+
 ostream& operator<<(ostream& os, const Variable& var) {
-	os << var.identifier << "=" << *(var.aexp);
+	os << var.getString();
 	return os;
-};
+}
 
 ostream& operator<<(ostream& os, const Function& func) {
 	os << func.identifier << "(";
@@ -685,12 +689,12 @@ ostream& operator<<(ostream& os, const Function& func) {
 	}
 	os << ")=" << *(func.aexp);
 	return os;
-};
+}
 
 ostream& operator<<(ostream& os, const Command& com) {
 	os << *(com.aexp);
 	return os;
-};
+}
 
 string CAS::process(string strin) {
 #if defined (_WIN32)

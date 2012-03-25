@@ -289,8 +289,8 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left, new Multiplication(dp->right, ar)).expand(ei);
 	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right), dp->left).expand(ei);
 	else {
-		return new Division(al, ar);
-		/*list<ArithmeticExpression*> explist;
+        return new Division(al, ar);
+        /*list<ArithmeticExpression*> explist;
 		list<ArithmeticExpression*> reslist;
 		Addition *adl = dynamic_cast<Addition*>(al->formPolynom()), *adr = dynamic_cast<Addition*>(ar->formPolynom()), *nah = new Addition, *nal = new Addition, *adp;
 		reslist.push_front(new Division(nah, nal));
@@ -375,7 +375,7 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 				adl = dynamic_cast<Addition*>(Subtraction(adl, new Multiplication(reslist.back(), adr)).expand(ei)->formPolynom());
 			}
 		}
-		return Multiplication(reslist).expand(ei);*/
+        return Multiplication(reslist).expand(ei);*/
 	}
 }
 

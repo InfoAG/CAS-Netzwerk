@@ -86,7 +86,11 @@ void ChatterBoxServer::readyRead()
             } else if (line.mid(0, 5) == "reset") {
                 mycas.reset();
             } else {
-                message += QString::fromStdString(mycas.process(line.toStdString()));
+                try {
+                    message += QString::fromStdString(mycas.process(line.toStdString()));
+                } catch (const char* s) {
+                    message += s;
+                }
             }
 
             foreach(QTcpSocket *otherClient, clients)

@@ -63,7 +63,7 @@ void ChatterBoxServer::readyRead()
                 message += "->Grundrechenarten, sqrt(), log(), ln(), sin(), cos(), tan(), funktion(3,4)\n";
                 message += "->$n steht fuer den Ausdruck des n-ten Kommandos\n\n\n";
             } else if (line == "quit") exit(0);
-           /* else if (line == "print variables") {
+            else if (line == "print variables") {
                 vector<Variable> varvec = mycas.getVariables();
                 for (vector<Variable>::iterator it = varvec.begin(); it != varvec.end(); ++it)
                     message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString(*it) + "\n";
@@ -74,8 +74,8 @@ void ChatterBoxServer::readyRead()
             } else if (line == "print commands") {
                 vector<Command> comvec = mycas.getCommands();
                 for (vector<Command>::iterator it = comvec.begin(); it != comvec.end(); ++it)
-                    message += "[" + it - comvec.begin() + 1 + "]\t" + *it + "\n";*/
-            else if (line.mid(0, 15) == "delete variable") {
+                    message += "[" + it - comvec.begin() + 1 + "]\t" + *it + "\n";
+            } else if (line.mid(0, 15) == "delete variable") {
                 mycas.deleteVariable(line.mid(16, line.length() - 16).toStdString());
             } else if (line.mid(0, 15) == "delete function") {
                 mycas.deleteFunction(line.mid(16, line.length() - 16).toStdString());

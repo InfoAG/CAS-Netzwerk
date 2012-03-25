@@ -203,7 +203,7 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 		}
 	}
 	for (list<Multiplication*>::iterator it = monlist.begin(); it != monlist.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei));
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands)));
 	return new Addition(tmpvec);
 }
 
@@ -260,7 +260,7 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 	} 
 	tmpvec.clear();
 	for (vector<Exponentiation*>::iterator it = exvec.begin(); it != exvec.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei)); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {

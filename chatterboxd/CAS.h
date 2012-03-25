@@ -243,6 +243,7 @@ struct Variable {
 	bool expanded;
 
 	Variable(const string& n, ArithmeticExpression *ax) : identifier(n), aexp(ax), expanded(false) {};
+	string getString() const;
 
 	friend ostream& operator<<(ostream&, const Variable&);
 };

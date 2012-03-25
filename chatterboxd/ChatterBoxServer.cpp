@@ -66,15 +66,15 @@ void ChatterBoxServer::readyRead()
             else if (line == "print variables") {
                 vector<Variable> varvec = mycas.getVariables();
                 for (vector<Variable>::iterator it = varvec.begin(); it != varvec.end(); ++it)
-                    message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString(*it) + "\n";
+                    message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
             } else if (line == "print functions") {
                 vector<Function> funcvec = mycas.getFunctions();
                 for (vector<Function>::iterator it = funcvec.begin(); it != funcvec.end(); ++it)
-                    message += "[" + it - funcvec.begin() + 1 + "]\t" + *it + "\n";
+                    message += QString("[") + QString::number(it - funcvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
             } else if (line == "print commands") {
                 vector<Command> comvec = mycas.getCommands();
                 for (vector<Command>::iterator it = comvec.begin(); it != comvec.end(); ++it)
-                    message += "[" + it - comvec.begin() + 1 + "]\t" + *it + "\n";
+                    message += QString("[") + QString::number(it - comvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
             } else if (line.mid(0, 15) == "delete variable") {
                 mycas.deleteVariable(line.mid(16, line.length() - 16).toStdString());
             } else if (line.mid(0, 15) == "delete function") {

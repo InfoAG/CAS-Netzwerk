@@ -97,7 +97,7 @@ void MainWindow::readyRead()
             QString message = messageRegex.cap(2);
 
             roomTextEdit->append("<b>" + user + "</b>: " + message);
-        }
+        } else roomTextEdit->append(line);
     }
 }
 

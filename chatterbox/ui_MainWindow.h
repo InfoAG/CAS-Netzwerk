@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Sun 25. Mar 17:42:05 2012
+** Created: Mon 26. Mar 15:46:04 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -134,7 +134,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(sayButton->sizePolicy().hasHeightForWidth());
         sayButton->setSizePolicy(sizePolicy1);
-        sayButton->setMaximumSize(QSize(50, 16777215));
+        sayButton->setMaximumSize(QSize(60, 16777215));
 
         gridLayout->addWidget(sayButton, 1, 2, 1, 1);
 
@@ -208,17 +208,17 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         QWidget::setTabOrder(serverLineEdit, userLineEdit);
         QWidget::setTabOrder(userLineEdit, loginButton);
-        QWidget::setTabOrder(loginButton, roomTextEdit);
-        QWidget::setTabOrder(roomTextEdit, userListWidget);
-        QWidget::setTabOrder(userListWidget, sayLineEdit);
+        QWidget::setTabOrder(loginButton, sayLineEdit);
         QWidget::setTabOrder(sayLineEdit, sayButton);
+        QWidget::setTabOrder(sayButton, roomTextEdit);
+        QWidget::setTabOrder(roomTextEdit, userListWidget);
 
         retranslateUi(MainWindow);
         QObject::connect(sayLineEdit, SIGNAL(returnPressed()), sayButton, SLOT(animateClick()));
         QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));
         QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -226,9 +226,9 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
-        titleLabel->setText(QApplication::translate("MainWindow", "Chatter Box", 0, QApplication::UnicodeUTF8));
-        sayButton->setText(QApplication::translate("MainWindow", "Say", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "CAS Client", 0, QApplication::UnicodeUTF8));
+        titleLabel->setText(QApplication::translate("MainWindow", "CAS Client", 0, QApplication::UnicodeUTF8));
+        sayButton->setText(QApplication::translate("MainWindow", "Process", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MainWindow", "Server name:", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "User name:", 0, QApplication::UnicodeUTF8));
         loginButton->setText(QApplication::translate("MainWindow", "Login", 0, QApplication::UnicodeUTF8));

@@ -86,6 +86,7 @@ void MainWindow::readyRead()
             // If so, udpate our users list on the right:
             QStringList users = usersRegex.cap(1).split(",");
             userListWidget->clear();
+            new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             foreach(QString user, users)
                 new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
         }

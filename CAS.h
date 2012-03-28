@@ -237,6 +237,16 @@ struct Integral : public ArithmeticExpression {
 	virtual bool isEqual(ArithmeticExpression *) const;
 };
 
+struct Vector : public ArithmeticExpression {
+	ArithmeticExpression *coordinates[3];
+
+	Vector(ArithmeticExpression *c[]) { for (int i = 0; i < 3; i++) coordinates[i]=c[i]; };
+	virtual ArithmeticExpression *copy() const { return new Vector(*this); };
+	virtual ArithmeticExpression *expand(const ExpansionInformation&) const { return copy(); };
+	virtual string getString() const { return string("[") + coordinates[0]->getString() + string("|") + coordinates[1]->getString() + string("|") + coordinates[2]->getString() + string("]"); };
+	virtual bool isEqual(ArithmeticExpression *) const;
+};
+
 struct Variable {
 	string identifier;
 	ArithmeticExpression *aexp;

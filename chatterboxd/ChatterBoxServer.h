@@ -26,7 +26,10 @@ class ChatterBoxServer : public QTcpServer
     private:
         QSet<QTcpSocket*> clients;
         QMap<QTcpSocket*,QString> users;
-        CAS mycas;
+        CAS globalcas;
+        QMap<QTcpSocket*, CAS*> usercas;
+        QMap<QString, CAS*> namecas;
+        QMap<QTcpSocket*, QString> username;
 };
 
 #endif

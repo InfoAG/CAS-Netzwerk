@@ -203,7 +203,7 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 		}
 	}
 	for (list<Multiplication*>::iterator it = monlist.begin(); it != monlist.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei));
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands)));
 	return new Addition(tmpvec);
 }
 
@@ -260,7 +260,7 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 	} 
 	tmpvec.clear();
 	for (vector<Exponentiation*>::iterator it = exvec.begin(); it != exvec.end(); ++it)
-		tmpvec.push_back((*it)->expand(ei)); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
+		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
@@ -520,7 +520,11 @@ Multiplication *ArithmeticExpression::formMonom() const {
 }
 
 Multiplication *Multiplication::formMonom() const {
-	return new Multiplication(this->operands);
+	if (! dynamic_cast<NumericalValue*>(operands.front())) {
+		list<ArithmeticExpression*> clist(operands);
+		clist.push_front(new NumericalValue(1));
+		return new Multiplication(clist);
+	} else return new Multiplication(operands);
 }
 
 string CommandExpression::getString() const {
@@ -540,15 +544,25 @@ string Subtraction::getString() const {
 }
 
 string Multiplication::getString() const {
-	string str;
-	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != --(operands.end()); ++it)
-			str += (*it)->getString() + '*';
-	str += operands.back()->getString();
-	return str;
+	stringstream ss;
+	Addition *ap;
+	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
+		if (ap = dynamic_cast<Addition*>(*it)) ss << "(" << (*it)->getString() << ")";
+		else ss << (*it)->getString();
+		if (it != --(operands.end())) ss << "*";
+	}
+	return ss.str();
 }
 
 string Division::getString() const {
-	return left->getString() + "/" + right->getString();
+	stringstream ss;
+	LevelingOperation *lp = dynamic_cast<LevelingOperation*>(left), *rp = dynamic_cast<LevelingOperation*>(right);
+	if (lp) ss << "(" << left->getString() << ")";
+	else ss << left->getString();
+	ss << "/";
+	if (rp) ss << "(" << right->getString() << ")";
+	else ss << right->getString();
+	return ss.str();
 }
 
 string Exponentiation::getString() const {

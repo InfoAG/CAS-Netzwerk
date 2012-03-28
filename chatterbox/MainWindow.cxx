@@ -79,6 +79,7 @@ void MainWindow::readyRead()
         // Any message that starts with "/users:" is the server sending us a
         // list of users so we can show that list in our GUI:
         QRegExp usersRegex("^/users:(.*)$");
+        QRegExp scopeRegex("^/scope:(.*)$");
 
         // Is this a users message:
         if(usersRegex.indexIn(line) != -1)
@@ -86,9 +87,10 @@ void MainWindow::readyRead()
             // If so, udpate our users list on the right:
             QStringList users = usersRegex.cap(1).split(",");
             userListWidget->clear();
+            new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             foreach(QString user, users)
                 new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
-        }
+        } else if(scopeRegex.indexIn(line) != -1) titleLabel->setText("CAS Client (" + scopeRegex.cap(1) + ")");
         // Is this a normal chat message:
         else if(messageRegex.indexIn(line) != -1)
         {

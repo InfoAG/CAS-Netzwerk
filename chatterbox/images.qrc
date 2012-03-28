@@ -1,10 +1,6 @@
-<!--
-This is your Qt resource file for images. It makes Qt
-bundle images directly into your executable so you don't
-have to ship them with your program.
--->
 <RCC>
-  <qresource prefix="/" >
-    <file>user.png</file>
-  </qresource>
+    <qresource prefix="/">
+        <file>user.png</file>
+        <file>cas.png</file>
+    </qresource>
 </RCC>

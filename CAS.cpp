@@ -141,6 +141,12 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			return new Integral(ArithmeticExpression::create(tokens.at(0)), new VariableExpression(tokens.at(1)), strtod(tokens.at(2).c_str(), NULL), strtod(tokens.at(3).c_str(), NULL), strtod(tokens.at(4).c_str(), NULL));
 		} else if (strin.at(0) == '$' && DecimalRec::runWith(strin.substr(1, strin.length() - 1))) { //!!!!!!ALEX GUCK HIER
 			return new CommandExpression(atoi(strin.substr(1, strin.length() - 1).c_str()));		//!!!!!!!!! decimal, atoi
+		} else if (strin.at(0) == '[' && strin.at(strin.length() - 1) == ']') {
+			ArithmeticExpression *c[3];
+			vector<string> tokens;
+			Tokenize(strin.substr(1, strin.length() -2), tokens, "|");
+			for (int i = 0; i < 3; i++) c[i] = ArithmeticExpression::create(tokens.at(i));
+			return new Vector(c);
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
@@ -520,7 +526,11 @@ Multiplication *ArithmeticExpression::formMonom() const {
 }
 
 Multiplication *Multiplication::formMonom() const {
-	return new Multiplication(this->operands);
+	if (! dynamic_cast<NumericalValue*>(operands.front())) {
+		list<ArithmeticExpression*> clist(operands);
+		clist.push_front(new NumericalValue(1));
+		return new Multiplication(clist);
+	} else return new Multiplication(operands);
 }
 
 string CommandExpression::getString() const {
@@ -540,15 +550,25 @@ string Subtraction::getString() const {
 }
 
 string Multiplication::getString() const {
-	string str;
-	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != --(operands.end()); ++it)
-			str += (*it)->getString() + '*';
-	str += operands.back()->getString();
-	return str;
+	stringstream ss;
+	Addition *ap;
+	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
+		if (ap = dynamic_cast<Addition*>(*it)) ss << "(" << (*it)->getString() << ")";
+		else ss << (*it)->getString();
+		if (it != --(operands.end())) ss << "*";
+	}
+	return ss.str();
 }
 
 string Division::getString() const {
-	return left->getString() + "/" + right->getString();
+	stringstream ss;
+	LevelingOperation *lp = dynamic_cast<LevelingOperation*>(left), *rp = dynamic_cast<LevelingOperation*>(right);
+	if (lp) ss << "(" << left->getString() << ")";
+	else ss << left->getString();
+	ss << "/";
+	if (rp) ss << "(" << right->getString() << ")";
+	else ss << right->getString();
+	return ss.str();
 }
 
 string Exponentiation::getString() const {
@@ -635,6 +655,11 @@ bool VariableExpression::isEqual(ArithmeticExpression *other) const {
 bool Integral::isEqual(ArithmeticExpression *other) const {
 	Integral *ip = dynamic_cast<Integral*>(other);
 	return (ip && ip->lower_bound == lower_bound && ip->upper_bound == upper_bound && ip->intervals == intervals && ip->var->isEqual(var) && ip->aexp->isEqual(aexp));
+}
+
+bool Vector::isEqual(ArithmeticExpression *other) const {
+	Vector *vp = dynamic_cast<Vector*>(other);
+	return (vp && coordinates[0]->isEqual(vp->coordinates[0]) && coordinates[1]->isEqual(vp->coordinates[1]) && coordinates[2]->isEqual(vp->coordinates[2]));
 }
 
 bool CommandExpression::isEqual(ArithmeticExpression *other) const {

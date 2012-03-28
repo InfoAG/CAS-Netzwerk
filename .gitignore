@@ -19,5 +19,7 @@ build/
 *.perspectivev3
 *.mode1v3
 *.mode2v3
+Makefile
+qtgesamt.pro.user
 chatterbox-build-desktop-Qt_4_8_0_in_Pfad__System__Debug/
 chatterboxd-build-desktop-Qt_4_8_0_in_Pfad__System__Debug/

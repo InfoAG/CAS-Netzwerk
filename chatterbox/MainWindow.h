@@ -38,6 +38,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         // This function gets called when the socket tells us it's connected.
         void connected();
+        void disconnected();
 
     private:
 

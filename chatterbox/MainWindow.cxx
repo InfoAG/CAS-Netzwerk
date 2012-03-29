@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // connecting to the server (respectively):
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
 
 // This gets called when the loginButton gets clicked:
@@ -112,4 +113,9 @@ void MainWindow::connected()
 
     // And send our username to the chat server.
     socket->write(QString("/me:" + userLineEdit->text() + "\n").toUtf8());
+}
+
+void MainWindow::disconnected()
+{
+    stackedWidget->setCurrentWidget(loginPage);
 }

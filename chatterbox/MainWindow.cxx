@@ -38,7 +38,9 @@ void MainWindow::on_loginButton_clicked()
     // get a connected() function call (below). If it fails,
     // we won't get any error message because we didn't connect()
     // to the error() signal from this socket.
+    label_3->setText("connecting...");
     socket->connectToHost(serverLineEdit->text(), 4200);
+    //if (! socket->waitForConnected(5000)) label_3->setText("timed out!");
 }
 
 // This gets called when the user clicks the sayButton (next to where

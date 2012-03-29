@@ -2,6 +2,7 @@
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
+#include <QtGui>
 
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -24,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 }
 
 // This gets called when the loginButton gets clicked:
@@ -38,9 +40,9 @@ void MainWindow::on_loginButton_clicked()
     // get a connected() function call (below). If it fails,
     // we won't get any error message because we didn't connect()
     // to the error() signal from this socket.
-    label_3->setText("connecting...");
     socket->connectToHost(serverLineEdit->text(), 4200);
-    //if (! socket->waitForConnected(5000)) label_3->setText("timed out!");
+    loginButton->setEnabled(false);
+    loginButton->setText("connecting");
 }
 
 // This gets called when the user clicks the sayButton (next to where
@@ -119,5 +121,33 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
+    loginButton->setText("Login");
+    loginButton->setEnabled(true);
     stackedWidget->setCurrentWidget(loginPage);
+}
+
+void MainWindow::displayError(QAbstractSocket::SocketError socketError)
+{
+    loginButton->setText("Login");
+    loginButton->setEnabled(true);
+    switch (socketError) {
+    case QAbstractSocket::RemoteHostClosedError:
+        break;
+    case QAbstractSocket::HostNotFoundError:
+        QMessageBox::information(this, tr("CAS Client"),
+                                 tr("The host was not found. Please check the "
+                                    "host name and port settings."));
+        break;
+    case QAbstractSocket::ConnectionRefusedError:
+        QMessageBox::information(this, tr("CAS Client"),
+                                 tr("The connection was refused by the peer. "
+                                    "Make sure the CAS server is running, "
+                                    "and check that the host name and port "
+                                    "settings are correct."));
+        break;
+    default:
+        QMessageBox::information(this, tr("CAS Client"),
+                                 tr("The following error occurred: %1.")
+                                 .arg(socket->errorString()));
+    }
 }

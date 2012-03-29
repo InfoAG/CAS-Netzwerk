@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 29. Mar 10:54:55 2012
+** Created: Thu 29. Mar 14:37:40 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -56,7 +56,6 @@ public:
     QLabel *label_2;
     QLineEdit *userLineEdit;
     QPushButton *loginButton;
-    QLabel *label_3;
     QSpacerItem *horizontalSpacer_2;
     QSpacerItem *verticalSpacer_2;
 
@@ -188,13 +187,6 @@ public:
 
         gridLayout_2->addWidget(loginButton, 2, 1, 1, 1);
 
-        label_3 = new QLabel(loginFrame);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setEnabled(true);
-        label_3->setAlignment(Qt::AlignCenter);
-
-        gridLayout_2->addWidget(label_3, 2, 0, 1, 1);
-
 
         gridLayout_3->addWidget(loginFrame, 1, 1, 1, 1);
 
@@ -240,7 +232,6 @@ public:
         label->setText(QApplication::translate("MainWindow", "Server name:", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "User name:", 0, QApplication::UnicodeUTF8));
         loginButton->setText(QApplication::translate("MainWindow", "Login", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QString());
     } // retranslateUi
 
 };

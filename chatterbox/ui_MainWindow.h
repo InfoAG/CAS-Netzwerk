@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 29. Mar 14:37:40 2012
+** Created: Fri 30. Mar 17:35:06 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,6 +45,7 @@ public:
     QListWidget *userListWidget;
     QLineEdit *sayLineEdit;
     QPushButton *sayButton;
+    QListWidget *scopeListWidget;
     QWidget *loginPage;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
@@ -115,17 +116,17 @@ public:
         roomTextEdit->setObjectName(QString::fromUtf8("roomTextEdit"));
         roomTextEdit->setReadOnly(true);
 
-        gridLayout->addWidget(roomTextEdit, 0, 0, 1, 1);
+        gridLayout->addWidget(roomTextEdit, 0, 1, 1, 1);
 
         userListWidget = new QListWidget(chatPage);
         userListWidget->setObjectName(QString::fromUtf8("userListWidget"));
 
-        gridLayout->addWidget(userListWidget, 0, 1, 1, 2);
+        gridLayout->addWidget(userListWidget, 0, 2, 1, 2);
 
         sayLineEdit = new QLineEdit(chatPage);
         sayLineEdit->setObjectName(QString::fromUtf8("sayLineEdit"));
 
-        gridLayout->addWidget(sayLineEdit, 1, 0, 1, 2);
+        gridLayout->addWidget(sayLineEdit, 1, 0, 1, 3);
 
         sayButton = new QPushButton(chatPage);
         sayButton->setObjectName(QString::fromUtf8("sayButton"));
@@ -136,7 +137,13 @@ public:
         sayButton->setSizePolicy(sizePolicy1);
         sayButton->setMaximumSize(QSize(60, 16777215));
 
-        gridLayout->addWidget(sayButton, 1, 2, 1, 1);
+        gridLayout->addWidget(sayButton, 1, 3, 1, 1);
+
+        scopeListWidget = new QListWidget(chatPage);
+        scopeListWidget->setObjectName(QString::fromUtf8("scopeListWidget"));
+        scopeListWidget->setMaximumSize(QSize(100, 16777215));
+
+        gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);
 
         stackedWidget->addWidget(chatPage);
         loginPage = new QWidget();
@@ -218,7 +225,7 @@ public:
         QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));
         QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

@@ -4,6 +4,11 @@
 #include <QRegExp>
 #include <QtGui>
 
+QDataStream& operator<<(QDataStream& stream, const User& user) {
+    stream << user.getName();
+    return stream;
+}
+
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -114,9 +119,14 @@ void MainWindow::connected()
 {
     // Flip over to the chat page:
     stackedWidget->setCurrentWidget(chatPage);
+    scopeListWidget->addItem("global");
+    scopeListWidget->addItem("New Scope...");
+    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
 
+    stream.setDevice(socket);
     // And send our username to the chat server.
-    socket->write(QString("/me:" + userLineEdit->text() + "\n").toUtf8());
+    //socket->write(QString("/me:" + userLineEdit->text() + "\n").toUtf8());
+    stream << User(userLineEdit->text());
 }
 
 void MainWindow::disconnected()
@@ -149,5 +159,11 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
         QMessageBox::information(this, tr("CAS Client"),
                                  tr("The following error occurred: %1.")
                                  .arg(socket->errorString()));
-    }
+    } 
+}
+
+void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
+    roomTextEdit->clear();
+    userListWidget->clear();
+    socket->write(QString("scope " + current->text() + "\n").toUtf8());
 }

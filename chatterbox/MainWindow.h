@@ -6,6 +6,16 @@
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
 
+class User {
+private:
+    QString name;
+public:
+    User(QString n) : name(n) {};
+    QString getName() const { return name; };
+};
+
+QDataStream& operator<<(QDataStream&, const User&);
+
 /*
  * This is the MainWindow class that we have told to inherit from
  * our Designer MainWindow (ui::MainWindow)
@@ -41,8 +51,11 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void disconnected();
         void displayError(QAbstractSocket::SocketError);
 
+        void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+
     private:
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
+        QDataStream stream;
 };

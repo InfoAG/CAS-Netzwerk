@@ -119,7 +119,6 @@ void MainWindow::connected()
     // And send our username to the chat server.
 
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
->>>>>>> QtNetzwerk
 }
 
 void MainWindow::disconnected()

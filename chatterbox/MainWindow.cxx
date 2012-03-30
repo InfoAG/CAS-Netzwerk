@@ -163,5 +163,5 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
 void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
     roomTextEdit->clear();
     userListWidget->clear();
-    socket->write(QString("scope " + current->text() + "\n").toUtf8());
+    socket->write(QString("scope:" + current->text() + "\n").toUtf8());
 }

@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // connecting to the server (respectively):
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
+
+    //handle disconnect and error signals:
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 }
@@ -55,7 +57,7 @@ void MainWindow::on_sayButton_clicked()
     // Only send the text to the chat server if it's not empty:
     if(!message.isEmpty())
     {
-        socket->write(QString(message + "\n").toUtf8());
+        socket->write(QString("msg:" + message + "\n").toUtf8());
     }
 
     // Clear out the input box so they can type something else:
@@ -75,33 +77,23 @@ void MainWindow::readyRead()
         // that non-English speakers can chat in their native language)
         QString line = QString::fromUtf8(socket->readLine()).trimmed();
 
-        // These two regular expressions describe the kinds of messages
-        // the server can send us:
-
-        //  Normal messges look like this: "username:The message"
-        QRegExp messageRegex("^([^:]+):(.*)$");
-
-        // Any message that starts with "/users:" is the server sending us a
-        // list of users so we can show that list in our GUI:
-        QRegExp usersRegex("^/users:(.*)$");
-        QRegExp scopeRegex("^/scope:(.*)$");
-
-        // Is this a users message:
-        if(usersRegex.indexIn(line) != -1)
+        // Is this a user list message:
+        if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
-            QStringList users = usersRegex.cap(1).split(",");
+            QStringList users = line.right(line.length() - line.indexOf(':') - 1).split(",");
             userListWidget->clear();
             new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             foreach(QString user, users)
                 new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
-        } else if(scopeRegex.indexIn(line) != -1) titleLabel->setText("CAS Client (" + scopeRegex.cap(1) + ")");
+        } else if(line.left(line.indexOf(':')) == "scope") titleLabel->setText("CAS Client (" + line.right(line.length() - line.indexOf(':') - 1) + ")");
         // Is this a normal chat message:
-        else if(messageRegex.indexIn(line) != -1)
+        else if(line.left(line.indexOf(':')) == "msg")
         {
             // If so, append this message to our chat box:
-            QString user = messageRegex.cap(1);
-            QString message = messageRegex.cap(2);
+            int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1);
+            QString user = line.mid(posfirst + 1, possecond - 4);
+            QString message = line.right(line.length() - possecond - 1);
 
             roomTextEdit->append("<b>" + user + "</b>: " + message);
         } else roomTextEdit->append(line);
@@ -116,20 +108,26 @@ void MainWindow::connected()
     stackedWidget->setCurrentWidget(chatPage);
 
     // And send our username to the chat server.
-    socket->write(QString("/me:" + userLineEdit->text() + "\n").toUtf8());
+    socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
 }
 
 void MainWindow::disconnected()
 {
+    //prepare loginPage:
     loginButton->setText("Login");
     loginButton->setEnabled(true);
+
+    //switch to loginPage:
     stackedWidget->setCurrentWidget(loginPage);
 }
 
 void MainWindow::displayError(QAbstractSocket::SocketError socketError)
 {
+    //reset login-Button:
     loginButton->setText("Login");
     loginButton->setEnabled(true);
+
+    //show error message:
     switch (socketError) {
     case QAbstractSocket::RemoteHostClosedError:
         break;

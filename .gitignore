@@ -33,3 +33,10 @@ chatterbox/moc_MainWindow.cpp
 chatterbox/moc_MainWindow.o
 chatterbox/qrc_images.cpp
 chatterbox/qrc_images.o
+chatterboxd/CAS.o
+chatterboxd/chatterboxd.app/
+chatterboxd/lexer.o
+chatterboxd/main.o
+chatterboxd/moc_ChatterBoxServer.cpp
+chatterboxd/moc_ChatterBoxServer.o
+

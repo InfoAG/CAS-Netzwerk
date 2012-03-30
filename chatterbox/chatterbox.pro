@@ -29,10 +29,13 @@ RESOURCES += images.qrc
 # to these lists as you add new windows, custom widgets, or new
 # functionality:
 
-FORMS   += MainWindow.ui 
+FORMS   += MainWindow.ui \  
+    matrix.ui
 
-HEADERS += MainWindow.h 
+HEADERS += MainWindow.h \ 
+    matrix.h
 
 SOURCES += MainWindow.cxx \
-           main.cpp
+           main.cpp \
+    matrix.cpp
 

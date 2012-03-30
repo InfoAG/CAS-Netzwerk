@@ -1,4 +1,6 @@
 #include "MainWindow.h"
+#include "matrix.h"
+#include "ui_matrix.h"
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
@@ -147,5 +149,18 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
         QMessageBox::information(this, tr("CAS Client"),
                                  tr("The following error occurred: %1.")
                                  .arg(socket->errorString()));
+    }
+}
+
+
+
+void MainWindow::on_sayLineEdit_textChanged(const QString &arg1)
+{
+    if (sayLineEdit->text().right(1) == "[")
+    {
+        this->Ui_MainWindow.sayLineEdit
+        Matrix* matrix = new Matrix;
+        matrix->show();
+
     }
 }

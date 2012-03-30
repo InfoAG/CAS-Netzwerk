@@ -1,33 +1,57 @@
 #include "Matrix.h"
 #include <iostream>
+#include <ctime>
 
 using namespace std;
 
 int main()
 {
-	int** k = new int*[3];
+	int groesse;
+	cout << "Wie viele Gleichungen wollen Sie eingeben?: ";
+	cin >> groesse;
 	
-	for(int i = 0; i < 3; i++)
+	double* m_ergebnisse = new double[groesse];
+	double **m_array = new double*[groesse];	
+	
+	for(int i = 0; i < groesse; i++)
 	{
-		k[i] = new int[3];
+		m_array[i] = new double[groesse];
 	}
 	
-	for(int i = 0; i < 3; i++)
+	
+	for(int i = 0; i < groesse; i++)
 	{
-		for(int j = 0; j < 3; j++)
+		cout << "Geben Sie die Koeffizienten der " << i+1 << ". Gleichung ein: " << endl;
+		
+		for(int j = 0; j < groesse; j++)
 		{
-			k[i][j] = rand() % 10+1;
+			cout << "a" << groesse-j << ": ";
+			cin >> m_array[i][j];
 		}
+		
+		cout << endl;
 	}
 	
-	
-	int* e = new int[3];
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < groesse; i++)
 	{
-		e[i] = rand() % 10+1;
+	    cout << "Geben Sie die Loesung der " << i+1 << ". Gleichung ein: ";
+	    cin >> m_ergebnisse[i];
 	}
 	
-	Matrix test(3, k, e);
+	cout << endl;
+	
+	Matrix test(groesse, m_array, m_ergebnisse);
+	
+	cout << test << endl;
+	
+	test.setResults();
+	
+	double* ergebnisse = test.getResults();
+	
+	for(int i = 0; i < groesse; i++)
+	{
+		cout << (char)(i+97) << " = " << ergebnisse[i] << endl;
+	}
 	
 	
 	return 0;

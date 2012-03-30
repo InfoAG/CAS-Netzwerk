@@ -19,3 +19,9 @@ int main(int argc, char **argv)
     // user input and stuff like that.
     return app.exec();
 }
+
+
+
+
+
+//Lars ist viel cooler als Alex

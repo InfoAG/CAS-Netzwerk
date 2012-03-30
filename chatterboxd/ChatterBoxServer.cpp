@@ -5,6 +5,7 @@
 
 ChatterBoxServer::ChatterBoxServer(QObject *parent) : QTcpServer(parent)
 {
+    //create CAS for global scope:
     namecas["global"] = new CAS;
 }
 
@@ -13,12 +14,18 @@ void ChatterBoxServer::incomingConnection(int socketfd)
     QTcpSocket *client = new QTcpSocket(this);
     client->setSocketDescriptor(socketfd);
     clients.insert(client);
+
+    //assign user to global scope:
     usercas[client] = namecas["global"];
     username[client] = "global";
-    client->write(QString("/scope:global\n").toUtf8());
 
+    //tell user his scope:
+    client->write(QString("scope:global\n").toUtf8());
+
+    //report new user to server console:
     qDebug() << "New client from:" << client->peerAddress().toString();
 
+    //connect to socket signals:
     connect(client, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
@@ -28,23 +35,28 @@ void ChatterBoxServer::readyRead()
     QTcpSocket *client = (QTcpSocket*)sender();
     while(client->canReadLine())
     {
+        //read line and remove whitespaces:
         QString line = QString::fromUtf8(client->readLine()).trimmed();
+        //write to server console:
         qDebug() << "Read line:" << line;
 
-        QRegExp meRegex("^/me:(.*)$");
-
-        if(meRegex.indexIn(line) != -1)
+        if(line.left(line.indexOf(':')) == "me") //new user
         {
-            QString user = meRegex.cap(1);
+            //username:
+            QString user = line.right(line.length() - line.indexOf(':') - 1);
+            //add user to socket/user list:
             users[client] = user;
+            //send "new user"-message to all clients:
             foreach(QTcpSocket *client, clients)
-                client->write(QString("Server:" + user + " has joined.\n").toUtf8());
+                client->write(QString("msg:Server:" + user + " has joined.\n").toUtf8());
+            //update user list:
             sendUserList();
         }
-        else if(users.contains(client))
+        else if(users.contains(client) && line.left(line.indexOf(':')) == "msg")
         {
             QString message = "<b>CAS</b>:";
             QString user = users[client];
+            line = line.right(line.length() - line.indexOf(':') - 1);
             qDebug() << "User:" << user;
             qDebug() << "Message:" << line;
 
@@ -92,17 +104,6 @@ void ChatterBoxServer::readyRead()
             } else if (line == "print scopes") {
                 for (QMap<QString, CAS*>::iterator it = namecas.begin(); it != namecas.end(); ++it)
                     message += it.key() + "\n";
-            } else if (line.left(5) == "scope") {
-                QString scopename = line.right(line.length() - 6);
-                if (namecas.contains(scopename)) usercas[client] = namecas[scopename];
-                else {
-                    CAS *ncas = new CAS;
-                    namecas[scopename] = ncas;
-                    usercas[client] = ncas;
-                }
-                username[client] = scopename;
-                client->write(QString("/scope:" + scopename + "\nYou are now in scope \"" + scopename + "\"\n").toUtf8());
-                sendUserList();
             } else {
                 try {
                     message += QString::fromStdString(usercas[client]->process(line.toStdString()));
@@ -112,7 +113,7 @@ void ChatterBoxServer::readyRead()
             }
 
             foreach(QTcpSocket *otherClient, clients)
-                otherClient->write(QString(user + ":" + line + "\n" + message + "\n").toUtf8());
+                otherClient->write(QString("<b>" + user + "</b>:" + line + "\n" + message + "\n").toUtf8());
         }
         else
         {
@@ -124,24 +125,30 @@ void ChatterBoxServer::readyRead()
 void ChatterBoxServer::disconnected()
 {
     QTcpSocket *client = (QTcpSocket*)sender();
+    //write to server console:
     qDebug() << "Client disconnected:" << client->peerAddress().toString();
 
+    //remove from client and user lists:
     clients.remove(client);
 
     QString user = users[client];
     users.remove(client);
 
+    //update user lists:
     sendUserList();
+    //send message to clients:
     foreach(QTcpSocket *client, clients)
-        client->write(QString("Server:" + user + " has left.\n").toUtf8());
+        client->write(QString("msg:Server:" + user + " has left.\n").toUtf8());
 }
 
 void ChatterBoxServer::sendUserList()
 {
     QStringList userList;
+    //fill StringList with "username (scope)"
     for (QMap<QTcpSocket*,QString>::iterator it = users.begin(); it != users.end(); ++it)
         userList << QString(it.value() + " (" + username[it.key()] + ")");
 
+    //send to clients:
     foreach(QTcpSocket *client, clients)
-        client->write(QString("/users:" + userList.join(",") + "\n").toUtf8());
+        client->write(QString("ul:" + userList.join(",") + "\n").toUtf8());
 }

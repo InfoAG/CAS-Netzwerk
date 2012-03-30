@@ -14,15 +14,14 @@ private:
 	double* x;
 	
 public:
-	Matrix(int g, double** c, double* r);
-	void setResults();
-	double* getResults() {return this->x;};
+	Matrix(int size, double** coeff, double* results);
+	double solve();
 	friend ostream& operator<<(ostream& stream, const Matrix& m);
 	
 	
 };
 
-Matrix::Matrix(int g, double** c, double* r) : n(g),a(c),b(r)
+Matrix::Matrix(int size, double** coeff, double* r) : n(size),a(coeff),b(results)
 {
 	this->x = new double[this->n];
 	for(int i = 0; i < this->n; i ++)
@@ -33,7 +32,7 @@ Matrix::Matrix(int g, double** c, double* r) : n(g),a(c),b(r)
 }
 
 
-void Matrix::setResults()
+double Matrix::solve()
 {
 	double f;	
 	
@@ -42,7 +41,7 @@ void Matrix::setResults()
 	{
 		for(int j = i+1; j < this->n; j++)
 		{
-			f = (double)this->a[j][i]/(double)this->a[i][i];
+			f = this->a[j][i]/this->a[i][i];
 			
 			for(int k = 0; k < this->n; k++)
 			{
@@ -70,6 +69,8 @@ void Matrix::setResults()
 		}
 		this->x[i] = z/this->a[i][i];
 	}
+	
+	return x;
 }
 
 

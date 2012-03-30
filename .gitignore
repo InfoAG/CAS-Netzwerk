@@ -5,7 +5,7 @@
 chatterbox/chatterbox.pro.user
 chatterboxd/chatterboxd.pro.user
 chatterboxd/ChatterBoxServer.o
-CAS-Netzwerk.vcxproj*
+*.vcxproj*
 Debug/
 Release/
 *.1

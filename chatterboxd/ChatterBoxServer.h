@@ -26,10 +26,10 @@ class ChatterBoxServer : public QTcpServer
     private:
         QSet<QTcpSocket*> clients;
         QMap<QTcpSocket*,QString> users;
-        CAS globalcas;
-        QMap<QTcpSocket*, CAS*> usercas;
-        QMap<QString, CAS*> namecas;
-        QMap<QTcpSocket*, QString> username;
+        CAS globalcas; //CAS for global scope
+        QMap<QTcpSocket*, CAS*> usercas; //to look up CAS by socket
+        QMap<QString, CAS*> namecas; //to look up CAS by scope name
+        QMap<QTcpSocket*, QString> username; //to look up scope name by socket
 };
 
 #endif

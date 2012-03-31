@@ -31,8 +31,12 @@ RESOURCES += images.qrc
 
 FORMS   += MainWindow.ui 
 
-HEADERS += MainWindow.h 
+HEADERS += MainWindow.h \  
+    onelinetextedit.h \
+    syntaxhighlighter.h
 
 SOURCES += MainWindow.cxx \
-           main.cpp
+           main.cpp \
+    onelinetextedit.cpp \
+    syntaxhighlighter.cpp
 

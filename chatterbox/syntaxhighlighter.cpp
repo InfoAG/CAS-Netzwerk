@@ -10,7 +10,9 @@ void SyntaxHighlighter::highlightBlock(const QString &text)
     for(int i = 0; i < text.length(); i++)
     {
         if(text.mid(i,1) == "[")
-            setFormat(i,1, Qt::yellow);
+        {
+            setFormat(i,1, Qt::darkCyan);
+        }
     }
 
 }

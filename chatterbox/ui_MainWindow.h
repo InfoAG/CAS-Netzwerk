@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Sat 31. Mar 22:46:02 2012
+** Created: Sat 31. Mar 23:07:03 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -148,7 +148,7 @@ public:
         sizePolicy2.setHeightForWidth(sayTextEdit->sizePolicy().hasHeightForWidth());
         sayTextEdit->setSizePolicy(sizePolicy2);
         sayTextEdit->setMaximumSize(QSize(682, 22));
-        sayTextEdit->setFocusPolicy(Qt::TabFocus);
+        sayTextEdit->setFocusPolicy(Qt::StrongFocus);
         sayTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         sayTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         sayTextEdit->setTabChangesFocus(true);

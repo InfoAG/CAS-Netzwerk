@@ -99,6 +99,7 @@ void MainWindow::readyRead()
                 scopeListWidget->addItem(lwi);
                 if (! texteditbyscope.contains(scope)) {
                     QTextEdit *te = new QTextEdit;
+                    te->setReadOnly(true);
                     texteditbyscope[scope] = te;
                     stackedRooms->addWidget(te);
                 }
@@ -107,6 +108,7 @@ void MainWindow::readyRead()
             newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
             scopeListWidget->addItem(newScope);
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
+            stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
 
         // Is this a normal chat message:
         } else if(line.left(line.indexOf(':')) == "msg")

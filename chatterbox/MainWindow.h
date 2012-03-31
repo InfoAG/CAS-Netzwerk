@@ -1,6 +1,7 @@
 // We need to include a couple Qt classes that we'll use:
 #include <QMainWindow>
 #include <QTcpSocket>
+#include <QtGui>
 
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  
@@ -60,4 +61,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         QTcpSocket *socket;
         QListWidgetItem *newScope;
         QString currentScope;
+        QMap<QString, QTextEdit*> texteditbyscope;
+        QMap<QString, QListWidgetItem*> listitembyscope;
 };

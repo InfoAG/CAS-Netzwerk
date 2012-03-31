@@ -39,7 +39,7 @@ void ChatterBoxServer::readyRead()
             users[client] = user;
             //send "new user"-message to all clients:
             foreach(QTcpSocket *client, clients)
-                client->write(QString("msg:Server:" + user + " has joined.\n").toUtf8());
+                //client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
             addUserToScope(client, "global");
             sendScopeList(client);
         }
@@ -131,7 +131,7 @@ void ChatterBoxServer::disconnected()
     deleteUser(client);
     //send message to clients:
     foreach(QTcpSocket *client, clients)
-        client->write(QString("msg:Server:" + user + " has left.\n").toUtf8());
+        client->write(QString("msg::Server:" + user + " has left.\n").toUtf8());
 }
 
 void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)

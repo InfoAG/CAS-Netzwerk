@@ -2,7 +2,6 @@
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
-#include <QtGui>
 
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -92,11 +91,20 @@ void MainWindow::readyRead()
             // If so, udpate our scope list on the left:
             QStringList scopes = line.right(line.length() - 3).split(",");
             scopeListWidget->clear();
-            foreach(QString scope, scopes)
-                scopeListWidget->addItem(scope);
+            foreach(QString scope, scopes) {
+                QListWidgetItem *lwi = new QListWidgetItem(scope);
+                listitembyscope[scope] = lwi;
+                scopeListWidget->addItem(lwi);
+                if (! texteditbyscope.contains(scope)) {
+                    QTextEdit *te = new QTextEdit;
+                    texteditbyscope[scope] = te;
+                    stackedRooms->addWidget(te);
+                }
+            }
             newScope = new QListWidgetItem("New Scope");
             newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
             scopeListWidget->addItem(newScope);
+            scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
 
         // Is this a normal chat message:
         } else if(line.left(line.indexOf(':')) == "msg")
@@ -107,8 +115,11 @@ void MainWindow::readyRead()
             QString user = line.mid(possecond + 1, posthird - possecond - 1);
             QString message = line.right(line.length() - posthird - 1);
 
-            if (scope.isEmpty() || scope == currentScope) roomTextEdit->append("<b>" + user + "</b>: " + message);
-        } else roomTextEdit->append(line);
+            if (scope.isEmpty()) {
+                foreach (QTextEdit *te, texteditbyscope.values())
+                    te->append("<b>" + user + "</b>: " + message);
+            } else texteditbyscope[scope]->append("<b>" + user + "</b>: " + message);
+        } //else texteditbyscope[scope]->append(line);
     }
 }
 
@@ -167,9 +178,9 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
 
 void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
     if ((! (previous == NULL && current->text() == "global")) && current != NULL && current != newScope) {
-        roomTextEdit->clear();
         userListWidget->clear();
         socket->write(QString("scope:" + current->text() + "\n").toUtf8());
+        stackedRooms->setCurrentWidget(texteditbyscope[current->text()]);
         currentScope = current->text();
     }
 }
@@ -178,7 +189,6 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
     if (item == newScope) {
         if (item->text().isEmpty()) item->setText("New Scope");
         else if (item->text() != "New Scope") {
-            roomTextEdit->clear();
             userListWidget->clear();
             socket->write(QString("scope:" + item->text() + "\n").toUtf8());
             currentScope = item->text();

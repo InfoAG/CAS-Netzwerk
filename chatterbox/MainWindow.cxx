@@ -1,4 +1,6 @@
 #include "MainWindow.h"
+#include "onelinetextedit.h"
+#include "syntaxhighlighter.h"
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     //handle disconnect and error signals:
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
+
 }
 
 // This gets called when the loginButton gets clicked:
@@ -52,7 +55,7 @@ void MainWindow::on_loginButton_clicked()
 void MainWindow::on_sayButton_clicked()
 {
     // What did they want to say (minus white space around the string):
-    QString message = sayLineEdit->text().trimmed();
+    QString message = this->sayTextEdit->toPlainText().trimmed();
 
     // Only send the text to the chat server if it's not empty:
     if(!message.isEmpty())
@@ -61,10 +64,10 @@ void MainWindow::on_sayButton_clicked()
     }
 
     // Clear out the input box so they can type something else:
-    sayLineEdit->clear();
+    this->sayTextEdit->clear();
 
     // Put the focus back into the input box so they can type again:
-    sayLineEdit->setFocus();
+    this->sayTextEdit->setFocus();
 }
 
 // This function gets called whenever the chat server has sent us some text:
@@ -149,3 +152,14 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
                                  .arg(socket->errorString()));
     }
 }
+
+
+void MainWindow::on_sayTextEdit_textChanged()
+{
+    SyntaxHighlighter* syntax = new SyntaxHighlighter(sayTextEdit->document());
+}
+
+
+
+
+

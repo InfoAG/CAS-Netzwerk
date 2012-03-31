@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 29. Mar 14:37:40 2012
+** Created: Sat Mar 31 17:20:01 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -27,6 +27,7 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <onelinetextedit.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -43,8 +44,8 @@ public:
     QGridLayout *gridLayout;
     QTextEdit *roomTextEdit;
     QListWidget *userListWidget;
-    QLineEdit *sayLineEdit;
     QPushButton *sayButton;
+    OneLineTextEdit *sayTextEdit;
     QWidget *loginPage;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
@@ -122,11 +123,6 @@ public:
 
         gridLayout->addWidget(userListWidget, 0, 1, 1, 2);
 
-        sayLineEdit = new QLineEdit(chatPage);
-        sayLineEdit->setObjectName(QString::fromUtf8("sayLineEdit"));
-
-        gridLayout->addWidget(sayLineEdit, 1, 0, 1, 2);
-
         sayButton = new QPushButton(chatPage);
         sayButton->setObjectName(QString::fromUtf8("sayButton"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -137,6 +133,22 @@ public:
         sayButton->setMaximumSize(QSize(60, 16777215));
 
         gridLayout->addWidget(sayButton, 1, 2, 1, 1);
+
+        sayTextEdit = new OneLineTextEdit(chatPage);
+        sayTextEdit->setObjectName(QString::fromUtf8("sayTextEdit"));
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(sayTextEdit->sizePolicy().hasHeightForWidth());
+        sayTextEdit->setSizePolicy(sizePolicy2);
+        sayTextEdit->setMaximumSize(QSize(682, 22));
+        sayTextEdit->setFocusPolicy(Qt::TabFocus);
+        sayTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        sayTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        sayTextEdit->setTabChangesFocus(true);
+        sayTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+
+        gridLayout->addWidget(sayTextEdit, 1, 0, 1, 1);
 
         stackedWidget->addWidget(chatPage);
         loginPage = new QWidget();
@@ -208,17 +220,15 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         QWidget::setTabOrder(serverLineEdit, userLineEdit);
         QWidget::setTabOrder(userLineEdit, loginButton);
-        QWidget::setTabOrder(loginButton, sayLineEdit);
-        QWidget::setTabOrder(sayLineEdit, sayButton);
+        QWidget::setTabOrder(loginButton, sayButton);
         QWidget::setTabOrder(sayButton, roomTextEdit);
         QWidget::setTabOrder(roomTextEdit, userListWidget);
 
         retranslateUi(MainWindow);
-        QObject::connect(sayLineEdit, SIGNAL(returnPressed()), sayButton, SLOT(animateClick()));
         QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));
         QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

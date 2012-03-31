@@ -65,7 +65,7 @@ border-radius: 25px;
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="chatPage">
           <layout class="QGridLayout" name="gridLayout">
@@ -78,9 +78,6 @@ border-radius: 25px;
            </item>
            <item row="0" column="1" colspan="2">
             <widget class="QListWidget" name="userListWidget"/>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QLineEdit" name="sayLineEdit"/>
            </item>
            <item row="1" column="2">
             <widget class="QPushButton" name="sayButton">
@@ -98,6 +95,37 @@ border-radius: 25px;
              </property>
              <property name="text">
               <string>Process</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="OneLineTextEdit" name="sayTextEdit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>682</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::TabFocus</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="tabChangesFocus">
+              <bool>true</bool>
+             </property>
+             <property name="lineWrapMode">
+              <enum>QTextEdit::NoWrap</enum>
              </property>
             </widget>
            </item>
@@ -227,11 +255,17 @@ border-radius: 25px;
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>OneLineTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">onelinetextedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>serverLineEdit</tabstop>
   <tabstop>userLineEdit</tabstop>
   <tabstop>loginButton</tabstop>
-  <tabstop>sayLineEdit</tabstop>
   <tabstop>sayButton</tabstop>
   <tabstop>roomTextEdit</tabstop>
   <tabstop>userListWidget</tabstop>
@@ -239,30 +273,14 @@ border-radius: 25px;
  <resources/>
  <connections>
   <connection>
-   <sender>sayLineEdit</sender>
-   <signal>returnPressed()</signal>
-   <receiver>sayButton</receiver>
-   <slot>animateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>331</x>
-     <y>564</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>768</x>
-     <y>570</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>serverLineEdit</sender>
    <signal>returnPressed()</signal>
    <receiver>userLineEdit</receiver>
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>391</x>
-     <y>188</y>
+     <x>526</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

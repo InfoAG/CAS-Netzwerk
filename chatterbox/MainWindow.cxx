@@ -87,7 +87,7 @@ void MainWindow::readyRead()
             foreach(QString user, users)
                 new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
 
-        } else if(line.left(line.indexOf(':')) == "sl")
+        } else if(line.left(line.indexOf(':')) == "sl") //scope list update
         {
             // If so, udpate our scope list on the left:
             QStringList scopes = line.right(line.length() - 3).split(",");
@@ -102,11 +102,12 @@ void MainWindow::readyRead()
         } else if(line.left(line.indexOf(':')) == "msg")
         {
             // If so, append this message to our chat box:
-            int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1);
-            QString user = line.mid(posfirst + 1, possecond - 4);
-            QString message = line.right(line.length() - possecond - 1);
+            int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1), posthird = line.indexOf(':', possecond + 1);
+            QString scope = line.mid(posfirst + 1, possecond - 4);
+            QString user = line.mid(possecond + 1, posthird - possecond - 1);
+            QString message = line.right(line.length() - posthird - 1);
 
-            roomTextEdit->append("<b>" + user + "</b>: " + message);
+            if (scope.isEmpty() || scope == currentScope) roomTextEdit->append("<b>" + user + "</b>: " + message);
         } else roomTextEdit->append(line);
     }
 }
@@ -122,6 +123,7 @@ void MainWindow::connected()
 
     // And send our username to the chat server.
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
+    currentScope = "global";
 }
 
 void MainWindow::disconnected()
@@ -168,6 +170,7 @@ void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* p
         roomTextEdit->clear();
         userListWidget->clear();
         socket->write(QString("scope:" + current->text() + "\n").toUtf8());
+        currentScope = current->text();
     }
 }
 
@@ -178,6 +181,7 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
             roomTextEdit->clear();
             userListWidget->clear();
             socket->write(QString("scope:" + item->text() + "\n").toUtf8());
+            currentScope = item->text();
         }
     }
 }

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Fri 30. Mar 17:35:06 2012
+** Created: Sat 31. Mar 17:24:28 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -41,11 +41,14 @@ public:
     QStackedWidget *stackedWidget;
     QWidget *chatPage;
     QGridLayout *gridLayout;
-    QTextEdit *roomTextEdit;
     QListWidget *userListWidget;
     QLineEdit *sayLineEdit;
     QPushButton *sayButton;
     QListWidget *scopeListWidget;
+    QStackedWidget *stackedRooms;
+    QWidget *page;
+    QTextEdit *roomTextEdit;
+    QWidget *page_2;
     QWidget *loginPage;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
@@ -112,12 +115,6 @@ public:
         chatPage->setObjectName(QString::fromUtf8("chatPage"));
         gridLayout = new QGridLayout(chatPage);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        roomTextEdit = new QTextEdit(chatPage);
-        roomTextEdit->setObjectName(QString::fromUtf8("roomTextEdit"));
-        roomTextEdit->setReadOnly(true);
-
-        gridLayout->addWidget(roomTextEdit, 0, 1, 1, 1);
-
         userListWidget = new QListWidget(chatPage);
         userListWidget->setObjectName(QString::fromUtf8("userListWidget"));
 
@@ -144,6 +141,21 @@ public:
         scopeListWidget->setMaximumSize(QSize(100, 16777215));
 
         gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);
+
+        stackedRooms = new QStackedWidget(chatPage);
+        stackedRooms->setObjectName(QString::fromUtf8("stackedRooms"));
+        page = new QWidget();
+        page->setObjectName(QString::fromUtf8("page"));
+        roomTextEdit = new QTextEdit(page);
+        roomTextEdit->setObjectName(QString::fromUtf8("roomTextEdit"));
+        roomTextEdit->setGeometry(QRect(0, 0, 391, 486));
+        roomTextEdit->setReadOnly(true);
+        stackedRooms->addWidget(page);
+        page_2 = new QWidget();
+        page_2->setObjectName(QString::fromUtf8("page_2"));
+        stackedRooms->addWidget(page_2);
+
+        gridLayout->addWidget(stackedRooms, 0, 1, 1, 1);
 
         stackedWidget->addWidget(chatPage);
         loginPage = new QWidget();
@@ -217,8 +229,7 @@ public:
         QWidget::setTabOrder(userLineEdit, loginButton);
         QWidget::setTabOrder(loginButton, sayLineEdit);
         QWidget::setTabOrder(sayLineEdit, sayButton);
-        QWidget::setTabOrder(sayButton, roomTextEdit);
-        QWidget::setTabOrder(roomTextEdit, userListWidget);
+        QWidget::setTabOrder(sayButton, userListWidget);
 
         retranslateUi(MainWindow);
         QObject::connect(sayLineEdit, SIGNAL(returnPressed()), sayButton, SLOT(animateClick()));
@@ -226,6 +237,7 @@ public:
         QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
         stackedWidget->setCurrentIndex(0);
+        stackedRooms->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

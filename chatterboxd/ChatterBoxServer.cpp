@@ -102,7 +102,7 @@ void ChatterBoxServer::readyRead()
                 }
 
                 foreach(QTcpSocket *otherClient, clients)
-                    otherClient->write(QString("<b>" + user + "</b>:" + line + "\n" + message + "\n").toUtf8());
+                    otherClient->write(QString("msg:" + scopebysocket[client] + ":" + user + ":" + line + "\n" + message + "\n").toUtf8());
 
             } else if (line.left(line.indexOf(':')) == "scope") {
                 QString scopename = line.right(line.length() - line.indexOf(':') - 1);

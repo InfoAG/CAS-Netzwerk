@@ -52,10 +52,11 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void displayError(QAbstractSocket::SocketError);
 
         void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+        void itemChanged(QListWidgetItem*);
 
     private:
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
-        QDataStream stream;
+        QListWidgetItem *newScope;
 };

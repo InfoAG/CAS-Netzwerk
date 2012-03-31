@@ -5,8 +5,6 @@
 
 ChatterBoxServer::ChatterBoxServer(QObject *parent) : QTcpServer(parent)
 {
-    //create CAS for global scope:
-    namecas["global"] = new CAS;
 }
 
 void ChatterBoxServer::incomingConnection(int socketfd)
@@ -14,13 +12,6 @@ void ChatterBoxServer::incomingConnection(int socketfd)
     QTcpSocket *client = new QTcpSocket(this);
     client->setSocketDescriptor(socketfd);
     clients.insert(client);
-
-    //assign user to global scope:
-    usercas[client] = namecas["global"];
-    username[client] = "global";
-
-    //tell user his scope:
-    client->write(QString("scope:global\n").toUtf8());
 
     //report new user to server console:
     qDebug() << "New client from:" << client->peerAddress().toString();
@@ -49,8 +40,8 @@ void ChatterBoxServer::readyRead()
             //send "new user"-message to all clients:
             foreach(QTcpSocket *client, clients)
                 client->write(QString("msg:Server:" + user + " has joined.\n").toUtf8());
-            //update user list:
-            sendUserList();
+            addUserToScope(client, "global");
+            sendScopeList(client);
         }
         else if(users.contains(client))
         {
@@ -81,33 +72,30 @@ void ChatterBoxServer::readyRead()
                     message += "->$n steht fuer den Ausdruck des n-ten Kommandos\n\n\n";
                 } else if (line == "quit") exit(0);
                 else if (line == "print variables") {
-                    vector<Variable> varvec = usercas[client]->getVariables();
+                    vector<Variable> varvec = casbyscope[scopebysocket[client]]->getVariables();
                     for (vector<Variable>::iterator it = varvec.begin(); it != varvec.end(); ++it)
                         message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
                 } else if (line == "print functions") {
-                    vector<Function> funcvec = usercas[client]->getFunctions();
+                    vector<Function> funcvec = casbyscope[scopebysocket[client]]->getFunctions();
                     for (vector<Function>::iterator it = funcvec.begin(); it != funcvec.end(); ++it)
                         message += QString("[") + QString::number(it - funcvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
                 } else if (line == "print commands") {
-                    vector<Command> comvec = usercas[client]->getCommands();
+                    vector<Command> comvec = casbyscope[scopebysocket[client]]->getCommands();
                     for (vector<Command>::iterator it = comvec.begin(); it != comvec.end(); ++it)
                         message += QString("[") + QString::number(it - comvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
                 } else if (line.left(15) == "delete variable") {
-                    usercas[client]->deleteVariable(line.right(line.length() - 16).toStdString());
+                    casbyscope[scopebysocket[client]]->deleteVariable(line.right(line.length() - 16).toStdString());
                 } else if (line.left(15) == "delete function") {
-                    usercas[client]->deleteFunction(line.right(line.length() - 16).toStdString());
+                    casbyscope[scopebysocket[client]]->deleteFunction(line.right(line.length() - 16).toStdString());
                 } else if (line.left(15) == "clear functions") {
-                    usercas[client]->clearFunctions();
+                    casbyscope[scopebysocket[client]]->clearFunctions();
                 } else if (line.left(15) == "clear variables") {
-                    usercas[client]->clearVariables();
+                    casbyscope[scopebysocket[client]]->clearVariables();
                 } else if (line.left(5) == "reset") {
-                    usercas[client]->reset();
-                } else if (line == "print scopes") {
-                    for (QMap<QString, CAS*>::iterator it = namecas.begin(); it != namecas.end(); ++it)
-                        message += it.key() + "\n";
+                    casbyscope[scopebysocket[client]]->reset();
                 } else {
                     try {
-                        message += QString::fromStdString(usercas[client]->process(line.toStdString()));
+                        message += QString::fromStdString(casbyscope[scopebysocket[client]]->process(line.toStdString()));
                     } catch (const char* s) {
                         message += s;
                     }
@@ -118,14 +106,7 @@ void ChatterBoxServer::readyRead()
 
             } else if (line.left(line.indexOf(':')) == "scope") {
                 QString scopename = line.right(line.length() - line.indexOf(':') - 1);
-                if (namecas.contains(scopename)) usercas[client] = namecas[scopename];
-                else {
-                    CAS *ncas = new CAS;
-                    namecas[scopename] = ncas;
-                    usercas[client] = ncas;
-                }
-                username[client] = scopename;
-                sendUserList(scopename);
+                changeUserScope(client, scopename);
             }
         }
         else
@@ -147,20 +128,61 @@ void ChatterBoxServer::disconnected()
     QString user = users[client];
     users.remove(client);
 
-    //update user lists:
-    sendUserList();
+    deleteUser(client);
     //send message to clients:
     foreach(QTcpSocket *client, clients)
         client->write(QString("msg:Server:" + user + " has left.\n").toUtf8());
 }
 
-void ChatterBoxServer::sendUserList(QString scope)
+void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)
 {
     QStringList userList;
-    for (QMap<QTcpSocket*,QString>::iterator it = users.begin(); it != users.end(); ++it)
-        userList << QString(it.value() + " (" + username[it.key()] + ")");
+    foreach(QTcpSocket *client, scopeclients)
+        userList << users[client];
 
     //send to clients:
-    foreach(QTcpSocket *client, clients)
+    foreach(QTcpSocket *client, scopeclients)
         client->write(QString("ul:" + userList.join(",") + "\n").toUtf8());
 }
+
+void ChatterBoxServer::sendScopeList(QTcpSocket* socket = NULL) {
+    QStringList scopeList;
+    foreach(QString scope, socketsbyscope.keys())
+        scopeList << scope;
+
+    if (socket) socket->write(QString("sl:" + scopeList.join(",") + "\n").toUtf8());
+    else {
+        foreach(QTcpSocket *client, clients)
+            client->write(QString("sl:" + scopeList.join(",") + "\n").toUtf8());
+    }
+}
+
+void ChatterBoxServer::addUserToScope(QTcpSocket* socket, QString scope) {
+    if (! socketsbyscope.contains(scope)) {
+        casbyscope[scope] = new CAS;
+        socketsbyscope[scope].push_back(socket);
+        sendScopeList();
+    } else socketsbyscope[scope].push_back(socket);
+    scopebysocket[socket] = scope;
+    sendUserListToScope(socketsbyscope[scope]);
+}
+
+void ChatterBoxServer::deleteUser(QTcpSocket* socket) {
+    scopebysocket.remove(socket);
+
+    int pos;
+    for (QMap<QString, QList<QTcpSocket*> >::iterator it = socketsbyscope.begin(); it != socketsbyscope.end(); ++it) {
+        pos = it.value().indexOf(socket);
+        if (pos != -1) {
+            it.value().removeOne(socket);
+            sendUserListToScope(it.value());
+        }
+    }
+}
+
+void ChatterBoxServer::changeUserScope(QTcpSocket* socket, QString scope) {
+    deleteUser(socket);
+    addUserToScope(socket, scope);
+}
+
+

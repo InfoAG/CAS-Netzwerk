@@ -4,11 +4,6 @@
 #include <QRegExp>
 #include <QtGui>
 
-QDataStream& operator<<(QDataStream& stream, const User& user) {
-    stream << user.getName();
-    return stream;
-}
-
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -86,14 +81,25 @@ void MainWindow::readyRead()
         if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
-            QStringList users = line.right(line.length() - line.indexOf(':') - 1).split(",");
+            QStringList users = line.right(line.length() - 3).split(",");
             userListWidget->clear();
             new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             foreach(QString user, users)
                 new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
-        } else if(line.left(line.indexOf(':')) == "scope") titleLabel->setText("CAS Client (" + line.right(line.length() - line.indexOf(':') - 1) + ")");
+
+        } else if(line.left(line.indexOf(':')) == "sl")
+        {
+            // If so, udpate our scope list on the left:
+            QStringList scopes = line.right(line.length() - 3).split(",");
+            scopeListWidget->clear();
+            foreach(QString scope, scopes)
+                scopeListWidget->addItem(scope);
+            newScope = new QListWidgetItem("New Scope");
+            newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
+            scopeListWidget->addItem(newScope);
+
         // Is this a normal chat message:
-        else if(line.left(line.indexOf(':')) == "msg")
+        } else if(line.left(line.indexOf(':')) == "msg")
         {
             // If so, append this message to our chat box:
             int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1);
@@ -111,13 +117,10 @@ void MainWindow::connected()
 {
     // Flip over to the chat page:
     stackedWidget->setCurrentWidget(chatPage);
-    scopeListWidget->addItem("global");
-    scopeListWidget->addItem("New Scope...");
     connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
 
-    stream.setDevice(socket);
     // And send our username to the chat server.
-
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
 }
 
@@ -161,7 +164,21 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
 }
 
 void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
-    roomTextEdit->clear();
-    userListWidget->clear();
-    socket->write(QString("scope:" + current->text() + "\n").toUtf8());
+    if ((! (previous == NULL && current->text() == "global")) && current != NULL && current != newScope) {
+        roomTextEdit->clear();
+        userListWidget->clear();
+        socket->write(QString("scope:" + current->text() + "\n").toUtf8());
+    }
 }
+
+void MainWindow::itemChanged(QListWidgetItem* item) {
+    if (item == newScope) {
+        if (item->text().isEmpty()) item->setText("New Scope");
+        else if (item->text() != "New Scope") {
+            roomTextEdit->clear();
+            userListWidget->clear();
+            socket->write(QString("scope:" + item->text() + "\n").toUtf8());
+        }
+    }
+}
+

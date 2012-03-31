@@ -2,6 +2,8 @@
 #define SYNTAXHIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
+#include <QTextCursor>
+#include <QPropertyAnimation>
 
 class SyntaxHighlighter: public QSyntaxHighlighter
 {
@@ -10,6 +12,7 @@ class SyntaxHighlighter: public QSyntaxHighlighter
     SyntaxHighlighter(QTextDocument* document);
 
     void highlightBlock(const QString &text);
+    QTextCharFormat format;
 };
 
 #endif // SYNTAXHIGHLIGHTER_H

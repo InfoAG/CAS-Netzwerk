@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "onelinetextedit.h"
-#include "syntaxhighlighter.h"
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
@@ -152,14 +151,6 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
                                  .arg(socket->errorString()));
     }
 }
-
-
-void MainWindow::on_sayTextEdit_textChanged()
-{
-    SyntaxHighlighter* syntax = new SyntaxHighlighter(sayTextEdit->document());
-}
-
-
 
 
 

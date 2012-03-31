@@ -41,8 +41,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void disconnected();
         void displayError(QAbstractSocket::SocketError);
 
-        void on_sayTextEdit_textChanged();
-
 private:
 
         // This is the socket that will let us communitate with the server.

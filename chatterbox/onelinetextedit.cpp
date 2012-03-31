@@ -1,4 +1,5 @@
 #include "onelinetextedit.h"
+#include "syntaxhighlighter.h"
 #include <QKeyEvent>
 #include <QApplication>
 #include <QPushButton>
@@ -11,6 +12,7 @@ OneLineTextEdit::OneLineTextEdit(QWidget* parent) : QTextEdit(parent),derp(paren
     setVerticalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
     setTabChangesFocus (true);
     setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+    SyntaxHighlighter* syntax = new SyntaxHighlighter(this->document());
 }
 
 QSize OneLineTextEdit::sizeHint () const

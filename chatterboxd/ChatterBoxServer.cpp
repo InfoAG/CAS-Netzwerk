@@ -39,7 +39,7 @@ void ChatterBoxServer::readyRead()
             users[client] = user;
             //send "new user"-message to all clients:
             foreach(QTcpSocket *client, clients)
-                //client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
+                client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
             addUserToScope(client, "global");
             sendScopeList(client);
         }
@@ -100,7 +100,6 @@ void ChatterBoxServer::readyRead()
                         message += s;
                     }
                 }
-
                 foreach(QTcpSocket *otherClient, clients)
                     otherClient->write(QString("msg:" + scopebysocket[client] + ":" + user + ":" + line + "\n" + message + "\n").toUtf8());
 
@@ -145,7 +144,7 @@ void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)
         client->write(QString("ul:" + userList.join(",") + "\n").toUtf8());
 }
 
-void ChatterBoxServer::sendScopeList(QTcpSocket* socket = NULL) {
+void ChatterBoxServer::sendScopeList() {
     QStringList scopeList;
     foreach(QString scope, socketsbyscope.keys())
         scopeList << scope;

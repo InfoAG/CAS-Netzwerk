@@ -3,28 +3,39 @@
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument* document):QSyntaxHighlighter(document)
 {
     format.setFontWeight(QFont::Bold);
-    format.setBackground(Qt::yellow);
+    format.setBackground(Qt::cyan);
     QFont hlFont = format.font();
-    hlFont.setPointSize(8.5);
     format.setFont(hlFont);
 }
 
 void SyntaxHighlighter::highlightBlock(const QString &text)
 {
-    for(int i = 0; i < text.length(); i++)
+    enum {NormalState = -1, InsideBracket};
+
+    int state = previousBlockState();
+    int start = 0;
+
+    for (int i = 0; i < text.length(); ++i)
     {
-        if(text.mid(i,1) == "[")
+        if (state == InsideBracket)
         {
-            setFormat(i,1, format);
-            /*QTextCursor imageCursor(currentBlock());
-            imageCursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, i);
-            QImage bracketImage(":/cas.png");
-            QPropertyAnimation animation(&bracketImage, "scale");
-            animation.setDuration(10000);
-            animation.setStartValue(1);
-            animation.setStartValue(10);
-            imageCursor.insertImage(bracketImage);
-            animation.start();*/
+            if (text.mid(i, 1) == "]")
+            {
+                state = NormalState;
+                setFormat(start, i - start + 1, format);
+            }
+        } else
+        {
+            if (text.mid(i, 1) == "[")
+            {
+                        start = i;
+                        state = InsideBracket;
+            }
         }
     }
+
+    if (state == InsideBracket)
+        setFormat(start, text.length() - start, format);
+
+    setCurrentBlockState(state);
 }

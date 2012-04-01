@@ -46,7 +46,7 @@ void ChatterBoxServer::readyRead()
         else if(users.contains(client))
         {
             if (line.left(line.indexOf(':')) == "msg") {
-                QString message = "<b>CAS</b>:";
+                QString message = "msg:" + scopebysocket[client] + ":CAS:";
                 QString user = users[client];
                 line = line.right(line.length() - line.indexOf(':') - 1);
                 qDebug() << "User:" << user;
@@ -144,7 +144,7 @@ void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)
         client->write(QString("ul:" + userList.join(",") + "\n").toUtf8());
 }
 
-void ChatterBoxServer::sendScopeList() {
+void ChatterBoxServer::sendScopeList(QTcpSocket *socket = NULL) {
     QStringList scopeList;
     foreach(QString scope, socketsbyscope.keys())
         scopeList << scope;

@@ -20,7 +20,7 @@ private:
 //public slots:
 //    void SyntaxLight();
 
-//signals:
+//signals:4ss4
 //    void textChanged();
 
 };

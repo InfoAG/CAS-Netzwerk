@@ -6,6 +6,7 @@
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
+#include "roomtextedit.h"
 
 class User {
 private:

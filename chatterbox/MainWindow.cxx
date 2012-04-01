@@ -98,7 +98,7 @@ void MainWindow::readyRead()
                 listitembyscope[scope] = lwi;
                 scopeListWidget->addItem(lwi);
                 if (! texteditbyscope.contains(scope)) {
-                    QTextEdit *te = new QTextEdit;
+                    QTextEdit *te = new roomTextEdit;
                     te->setReadOnly(true);
                     texteditbyscope[scope] = te;
                     stackedRooms->addWidget(te);
@@ -123,7 +123,7 @@ void MainWindow::readyRead()
                 foreach (QTextEdit *te, texteditbyscope.values())
                     te->append("<b>" + user + "</b>: " + message);
             } else texteditbyscope[scope]->append("<b>" + user + "</b>: " + message);
-        } //else texteditbyscope[scope]->append(line);
+        }
     }
 }
 

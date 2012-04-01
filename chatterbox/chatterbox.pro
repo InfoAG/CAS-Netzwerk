@@ -33,10 +33,12 @@ FORMS   += MainWindow.ui
 
 HEADERS += MainWindow.h \  
     onelinetextedit.h \
-    syntaxhighlighter.h
+    syntaxhighlighter.h \
+    roomtextedit.h
 
 SOURCES += MainWindow.cxx \
            main.cpp \
     onelinetextedit.cpp \
-    syntaxhighlighter.cpp
+    syntaxhighlighter.cpp \
+    roomtextedit.cpp
 

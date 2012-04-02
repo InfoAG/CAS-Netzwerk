@@ -100,7 +100,7 @@ border-radius: 25px;
               </size>
              </property>
              <property name="sortingEnabled">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>

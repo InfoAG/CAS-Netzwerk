@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Sun 1. Apr 15:15:05 2012
+** Created: Mon 2. Apr 22:33:22 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -131,7 +131,7 @@ public:
         scopeListWidget = new QListWidget(chatPage);
         scopeListWidget->setObjectName(QString::fromUtf8("scopeListWidget"));
         scopeListWidget->setMaximumSize(QSize(100, 16777215));
-        scopeListWidget->setSortingEnabled(true);
+        scopeListWidget->setSortingEnabled(false);
 
         gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);
 

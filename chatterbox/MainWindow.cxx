@@ -106,6 +106,7 @@ void MainWindow::readyRead()
             }
             newScope = new QListWidgetItem("New Scope");
             newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
+            scopeListWidget->sortItems();
             scopeListWidget->addItem(newScope);
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
             stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);

@@ -572,7 +572,14 @@ string Division::getString() const {
 }
 
 string Exponentiation::getString() const {
-	return left->getString() + "^" + right->getString();
+	stringstream ss;
+	LevelingOperation *lp = dynamic_cast<LevelingOperation*>(left), *rp = dynamic_cast<LevelingOperation*>(right);
+	if (lp) ss << "(" << left->getString() << ")";
+	else ss << left->getString();
+	ss << "^";
+	if (rp) ss << "(" << right->getString() << ")";
+	else ss << right->getString();
+	return ss.str();
 }
 
 string SquareRoot::getString() const {

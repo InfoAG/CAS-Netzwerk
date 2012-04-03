@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Mon 2. Apr 22:33:22 2012
+** Created: Tue 3. Apr 20:46:47 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -57,6 +57,7 @@ public:
     QLabel *label_2;
     QLineEdit *userLineEdit;
     QPushButton *loginButton;
+    QLabel *invalidLabel;
     QSpacerItem *horizontalSpacer_2;
     QSpacerItem *verticalSpacer_2;
 
@@ -203,7 +204,12 @@ public:
         sizePolicy1.setHeightForWidth(loginButton->sizePolicy().hasHeightForWidth());
         loginButton->setSizePolicy(sizePolicy1);
 
-        gridLayout_2->addWidget(loginButton, 2, 1, 1, 1);
+        gridLayout_2->addWidget(loginButton, 3, 1, 1, 1);
+
+        invalidLabel = new QLabel(loginFrame);
+        invalidLabel->setObjectName(QString::fromUtf8("invalidLabel"));
+
+        gridLayout_2->addWidget(invalidLabel, 2, 0, 1, 2);
 
 
         gridLayout_3->addWidget(loginFrame, 1, 1, 1, 1);
@@ -250,6 +256,7 @@ public:
         label->setText(QApplication::translate("MainWindow", "Server name:", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "User name:", 0, QApplication::UnicodeUTF8));
         loginButton->setText(QApplication::translate("MainWindow", "Login", 0, QApplication::UnicodeUTF8));
+        invalidLabel->setText(QString());
     } // retranslateUi
 
 };

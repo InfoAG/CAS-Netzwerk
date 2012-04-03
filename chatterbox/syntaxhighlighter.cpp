@@ -34,8 +34,14 @@ void SyntaxHighlighter::highlightBlock(const QString &text)
         }
     }
 
-    if (state == InsideBracket)
+    if (state == InsideBracket) {
         setFormat(start, text.length() - start, format);
+       /* QPropertyAnimation *anim = new QPropertyAnimation(herp, "opacity");
+        anim->setStartValue(1.0);
+        anim->setEndValue(0);
+        anim->setDuration(1000);
+        anim->start();*/
+    }
 
     setCurrentBlockState(state);
 }

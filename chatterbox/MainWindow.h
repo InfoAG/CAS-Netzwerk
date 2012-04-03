@@ -9,16 +9,6 @@
 #include "ui_MainWindow.h"
 #include "roomtextedit.h"
 
-class User {
-private:
-    QString name;
-public:
-    User(QString n) : name(n) {};
-    QString getName() const { return name; };
-};
-
-QDataStream& operator<<(QDataStream&, const User&);
-
 /*
  * This is the MainWindow class that we have told to inherit from
  * our Designer MainWindow (ui::MainWindow)
@@ -57,6 +47,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
         void itemChanged(QListWidgetItem*);
 
+        void userTextEdited(const QString&);
+
     private:
 
         // This is the socket that will let us communitate with the server.
@@ -65,4 +57,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         QString currentScope;
         QMap<QString, QTextEdit*> texteditbyscope;
         QMap<QString, QListWidgetItem*> listitembyscope;
+
+        QPropertyAnimation *anim;
 };

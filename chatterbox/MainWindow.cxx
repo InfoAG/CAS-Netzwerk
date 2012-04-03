@@ -12,6 +12,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // on the MainWindow that you setup in Designer.
     setupUi(this);
 
+    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(userTextEdited(QString)));
+    invalidLabel->setStyleSheet("QLabel { color : red; }");
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(invalidLabel);
+    invalidLabel->setGraphicsEffect(effect);
+    anim = new QPropertyAnimation(effect, "opacity");
+    anim->setStartValue(1.0);
+    anim->setEndValue(0);
+    anim->setDuration(1000);
+
     // Make sure that we are showing the login page when we startup:
     stackedWidget->setCurrentWidget(loginPage);
 
@@ -86,7 +95,6 @@ void MainWindow::readyRead()
             userListWidget->clear();
             QListWidgetItem *lwi = new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             lwi->setToolTip(socket->peerAddress().toString());
-            titleLabel->setText(socket->peerAddress().toString());
 
             int pos;
             foreach(QString user, users) {
@@ -200,11 +208,26 @@ void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* p
 void MainWindow::itemChanged(QListWidgetItem* item) {
     if (item == newScope) {
         if (item->text().isEmpty()) item->setText("New Scope");
+        else if (item->text().contains(",") || item->text().contains(":")) {
+            item->setText("New Scope");
+            QMessageBox::information(this, "New Scope", "Scope names cannot contain \",\" or \":\". Please choose a different name.");
+        }
         else if (item->text() != "New Scope") {
             userListWidget->clear();
             socket->write(QString("scope:" + item->text() + "\n").toUtf8());
             currentScope = item->text();
         }
+    }
+}
+
+void MainWindow::userTextEdited(const QString& text)
+{
+    if (text.contains(",") || text.contains(":")) {
+        invalidLabel->setText("Usernames cannot contain \",\" or \":\".");
+        userLineEdit->setText(userLineEdit->text().replace(",", ""));
+        userLineEdit->setText(userLineEdit->text().replace(":", ""));
+        anim->stop();
+        anim->start(QAbstractAnimation::KeepWhenStopped);
     }
 }
 

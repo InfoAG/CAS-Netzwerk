@@ -4,6 +4,8 @@
 #include <QSyntaxHighlighter>
 #include <QTextCursor>
 #include <QPropertyAnimation>
+#include <QGraphicsEffect>
+#include "onelinetextedit.h"
 
 class SyntaxHighlighter: public QSyntaxHighlighter
 {

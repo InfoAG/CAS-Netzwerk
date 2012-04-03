@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QtGui>
+#include <QHostAddress>
 
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  

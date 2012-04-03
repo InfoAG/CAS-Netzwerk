@@ -137,7 +137,7 @@ void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)
 {
     QStringList userList;
     foreach(QTcpSocket *client, scopeclients)
-        userList << users[client];
+        userList << users[client] + ":" + client->peerAddress().toString();
 
     //send to clients:
     foreach(QTcpSocket *client, scopeclients)

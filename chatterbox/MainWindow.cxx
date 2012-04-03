@@ -84,9 +84,16 @@ void MainWindow::readyRead()
             // If so, udpate our users list on the right:
             QStringList users = line.right(line.length() - 3).split(",");
             userListWidget->clear();
-            new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
-            foreach(QString user, users)
-                new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
+            QListWidgetItem *lwi = new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
+            lwi->setToolTip(socket->peerAddress().toString());
+            titleLabel->setText(socket->peerAddress().toString());
+
+            int pos;
+            foreach(QString user, users) {
+                pos = user.indexOf(":");
+                lwi = new QListWidgetItem(QPixmap(":/user.png"), user.left(pos), userListWidget);
+                lwi->setToolTip(user.right(user.length() - pos - 1));
+            }
 
         } else if(line.left(line.indexOf(':')) == "sl") //scope list update
         {

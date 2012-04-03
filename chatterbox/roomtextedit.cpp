@@ -2,5 +2,5 @@
 
 roomTextEdit::roomTextEdit()
 {
-    SyntaxHighlighter* syntax = new SyntaxHighlighter(this->document());
+    new SyntaxHighlighter(this->document());
 }

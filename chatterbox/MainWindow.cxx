@@ -227,7 +227,7 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
 void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
 {
     QListWidgetItem *under = scopeListWidget->itemAt(pos);
-    if(under != NULL) {
+    if(under && under->text() != "global") {
         QMenu *menu = new QMenu(this);
         menu->addAction("Delete Scope", this, SLOT(deleteScope()));
         menu->show();

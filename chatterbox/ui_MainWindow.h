@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Tue 3. Apr 20:46:47 2012
+** Created: Wed 4. Apr 19:14:53 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -66,6 +66,7 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(800, 600);
+        MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
         MainWindow->setStyleSheet(QString::fromUtf8("#titleLabel {\n"
 "background: white;\n"
 "color: blue;\n"
@@ -132,6 +133,8 @@ public:
         scopeListWidget = new QListWidget(chatPage);
         scopeListWidget->setObjectName(QString::fromUtf8("scopeListWidget"));
         scopeListWidget->setMaximumSize(QSize(100, 16777215));
+        scopeListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+        scopeListWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
         scopeListWidget->setSortingEnabled(false);
 
         gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);

@@ -37,6 +37,7 @@ class ChatterBoxServer : public QTcpServer
         void deleteUser(QTcpSocket*);
         void deleteUserFromScope(QTcpSocket*, QString);
         void changeUserScope(QTcpSocket*, QString);
+        void deleteScope(QString);
 };
 
 #endif

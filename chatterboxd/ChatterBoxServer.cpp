@@ -106,6 +106,9 @@ void ChatterBoxServer::readyRead()
             } else if (line.left(line.indexOf(':')) == "scope") {
                 QString scopename = line.right(line.length() - line.indexOf(':') - 1);
                 changeUserScope(client, scopename);
+            } else if (line.left(line.indexOf(':')) == "ds") {
+                QString scopename = line.right(line.length() - line.indexOf(':') - 1);
+                deleteScope(scopename);
             }
         }
         else
@@ -182,6 +185,14 @@ void ChatterBoxServer::deleteUser(QTcpSocket* socket) {
 void ChatterBoxServer::changeUserScope(QTcpSocket* socket, QString scope) {
     deleteUser(socket);
     addUserToScope(socket, scope);
+}
+
+void ChatterBoxServer::deleteScope(QString scope) {
+    foreach (QTcpSocket *client, socketsbyscope[scope]) {
+        changeUserScope(client, "global");
+        socketsbyscope.remove(scope);
+        sendScopeList();
+    }
 }
 
 

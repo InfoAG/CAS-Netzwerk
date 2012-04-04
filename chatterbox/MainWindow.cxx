@@ -38,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 
+    connect(scopeListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(customScopeContextMenuRequested(const QPoint&)));
+
 }
 
 // This gets called when the loginButton gets clicked:
@@ -108,6 +110,7 @@ void MainWindow::readyRead()
             // If so, udpate our scope list on the left:
             QStringList scopes = line.right(line.length() - 3).split(",");
             scopeListWidget->clear();
+            QMap<QString, QListWidgetItem*> listitembyscope;
             foreach(QString scope, scopes) {
                 QListWidgetItem *lwi = new QListWidgetItem(scope);
                 listitembyscope[scope] = lwi;
@@ -123,6 +126,7 @@ void MainWindow::readyRead()
             newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
             scopeListWidget->sortItems();
             scopeListWidget->addItem(newScope);
+            if (! listitembyscope.contains(currentScope)) currentScope = "global";
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
             stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
 
@@ -218,6 +222,21 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
             currentScope = item->text();
         }
     }
+}
+
+void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
+{
+    QListWidgetItem *under = scopeListWidget->itemAt(pos);
+    if(under != NULL) {
+        QMenu *menu = new QMenu(this);
+        menu->addAction("Delete Scope", this, SLOT(deleteScope()));
+        menu->show();
+    }
+}
+
+void MainWindow::deleteScope()
+{
+    socket->write(QString("ds:" + scopeListWidget->currentItem()->text() + "\n").toUtf8());
 }
 
 void MainWindow::userTextEdited(const QString& text)

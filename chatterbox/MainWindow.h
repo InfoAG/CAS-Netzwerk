@@ -46,6 +46,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
         void itemChanged(QListWidgetItem*);
+        void customScopeContextMenuRequested(const QPoint&);
+        void deleteScope();
 
         void userTextEdited(const QString&);
 
@@ -56,7 +58,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         QListWidgetItem *newScope;
         QString currentScope;
         QMap<QString, QTextEdit*> texteditbyscope;
-        QMap<QString, QListWidgetItem*> listitembyscope;
 
         QPropertyAnimation *anim;
 };

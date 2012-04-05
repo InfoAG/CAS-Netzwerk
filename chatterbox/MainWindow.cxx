@@ -230,7 +230,7 @@ void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
     if(under && under->text() != "global") {
         QMenu *menu = new QMenu(this);
         menu->addAction("Delete Scope", this, SLOT(deleteScope()));
-        menu->show();
+        menu->exec(scopeListWidget->mapToGlobal(pos));
     }
 }
 

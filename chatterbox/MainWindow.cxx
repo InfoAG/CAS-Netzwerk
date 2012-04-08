@@ -163,6 +163,8 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
+    texteditbyscope.clear();
+
     //prepare loginPage:
     loginButton->setText("Login");
     loginButton->setEnabled(true);

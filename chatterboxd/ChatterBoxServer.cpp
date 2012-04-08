@@ -73,26 +73,40 @@ void ChatterBoxServer::readyRead()
                 } else if (line == "quit") exit(0);
                 else if (line == "print variables") {
                     vector<Variable> varvec = casbyscope[scopebysocket[client]]->getVariables();
-                    for (vector<Variable>::iterator it = varvec.begin(); it != varvec.end(); ++it)
-                        message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
+                    if (varvec.empty()) message += "No variables to show.";
+                    else {
+                        for (vector<Variable>::iterator it = varvec.begin(); it != varvec.end(); ++it)
+                            message += QString("[") + QString::number(it - varvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
+                    }
                 } else if (line == "print functions") {
                     vector<Function> funcvec = casbyscope[scopebysocket[client]]->getFunctions();
+                    if (funcvec.empty()) message += "No functions to show.";
+                    else {
                     for (vector<Function>::iterator it = funcvec.begin(); it != funcvec.end(); ++it)
                         message += QString("[") + QString::number(it - funcvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
+                    }
                 } else if (line == "print commands") {
                     vector<Command> comvec = casbyscope[scopebysocket[client]]->getCommands();
-                    for (vector<Command>::iterator it = comvec.begin(); it != comvec.end(); ++it)
-                        message += QString("[") + QString::number(it - comvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
+                    if (comvec.empty()) message += "No commands to show.";
+                    else {
+                        for (vector<Command>::iterator it = comvec.begin(); it != comvec.end(); ++it)
+                            message += QString("[") + QString::number(it - comvec.begin() + 1) + QString("]\t") + QString::fromStdString(it->getString()) + "\n";
+                    }
                 } else if (line.left(15) == "delete variable") {
                     casbyscope[scopebysocket[client]]->deleteVariable(line.right(line.length() - 16).toStdString());
+                    message += "Variable deleted.";
                 } else if (line.left(15) == "delete function") {
                     casbyscope[scopebysocket[client]]->deleteFunction(line.right(line.length() - 16).toStdString());
+                    message += "Function deleted.";
                 } else if (line.left(15) == "clear functions") {
                     casbyscope[scopebysocket[client]]->clearFunctions();
+                    message += "Functions deleted.";
                 } else if (line.left(15) == "clear variables") {
                     casbyscope[scopebysocket[client]]->clearVariables();
+                    message += "Variables deleted.";
                 } else if (line.left(5) == "reset") {
                     casbyscope[scopebysocket[client]]->reset();
+                    message += "Reset successful.";
                 } else {
                     try {
                         message += QString::fromStdString(casbyscope[scopebysocket[client]]->process(line.toStdString()));

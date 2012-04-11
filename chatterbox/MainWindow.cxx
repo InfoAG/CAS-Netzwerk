@@ -219,7 +219,6 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
             QMessageBox::information(this, "New Scope", "Scope names cannot contain \",\" or \":\". Please choose a different name.");
         }
         else if (item->text() != "New Scope") {
-            userListWidget->clear();
             socket->write(QString("scope:" + item->text() + "\n").toUtf8());
             currentScope = item->text();
         }
@@ -229,7 +228,7 @@ void MainWindow::itemChanged(QListWidgetItem* item) {
 void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
 {
     QListWidgetItem *under = scopeListWidget->itemAt(pos);
-    if(under && under->text() != "global") {
+    if(under && under != newScope && under->text() != "global") {
         QMenu *menu = new QMenu(this);
         menu->addAction("Delete Scope", this, SLOT(deleteScope()));
         menu->exec(scopeListWidget->mapToGlobal(pos));

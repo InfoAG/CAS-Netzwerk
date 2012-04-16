@@ -26,13 +26,18 @@ QSize OneLineTextEdit::sizeHint () const
 
 void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
 {
-    if ((e->key () == Qt::Key_Enter) || (e->key () == Qt::Key_Return))
+    if ((e->key() == Qt::Key_Enter) || (e->key() == Qt::Key_Return))
     {
         QPushButton *button = this->derp->findChild<QPushButton *>("sayButton");
         button->animateClick();
-    }
+    } else if (e->key() == Qt::Key_BracketLeft) {
+        QTextEdit::keyPressEvent(e);
 
-    else
+        matrix MDlg;
+        if (MDlg.exec() == QDialog::Accepted) {
+            //this->append(MDlg.getMatrixString() + "]");
+        } else this->textCursor().deletePreviousChar();
+    } else
         QTextEdit::keyPressEvent (e);
 }
 

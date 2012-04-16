@@ -149,7 +149,7 @@ void matrix::changeContent(int val)
 
 
         //new setTabOrder defs: LARS GUCK HIER
-        QString current_className;
+        /*QString current_className;
         QWidget* current_widget;
         for(int i = 0; i < val; i++)
         {
@@ -167,7 +167,7 @@ void matrix::changeContent(int val)
             current_widget = res_layout->itemAt(i)->widget();
             setTabOrder(first,current_widget);
             first = current_widget;
-        }
+        }*/
 
 
 
@@ -209,8 +209,8 @@ void matrix::changeContent(int val)
         int eq_pos = ((val+1)*2+(val))-1;
         for(int i = 0; i < val; i++) //i = row; last row has been deleted
         {
-            if((eq_coef_layout->itemAtPosition(i,eq_pos-2) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos-1) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos) != 0))
-            {
+            //if((eq_coef_layout->itemAtPosition(i,eq_pos-2) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos-1) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos) != 0))
+            //{
                 tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos-2)->widget();
                 eq_coef_layout->removeWidget(tmp_widget);
                 delete tmp_widget;
@@ -220,7 +220,7 @@ void matrix::changeContent(int val)
                 tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos)->widget();
                 eq_coef_layout->removeWidget(tmp_widget);
                 delete tmp_widget;
-            }
+            //}
         }
 
         this->adjustSize();

@@ -26,7 +26,6 @@ private:
     QSpinBox* spin2; //var number
     QLabel* label1; //param label
     QLabel* label2; // ""
-    bool increase; //true, if value has increased
     int previousValue; //holds the previous value of the spin1/spin2
 
     QWidget* first; //global ptr for taborder definition

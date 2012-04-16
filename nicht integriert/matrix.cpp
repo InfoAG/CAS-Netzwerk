@@ -4,7 +4,6 @@ matrix::matrix(QWidget *parent) :
     QWidget(parent)
 {
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    this->increase = true;
     this->previousValue = 1;
 
     //input-parameter
@@ -88,29 +87,19 @@ void matrix::changeContent(int val)
 {
     if(val > previousValue)
     {
-        this->increase = true;
-        this->previousValue = val;
-    }
-    else
-    {
-        this->increase = false;
-        this->previousValue = val;
-    }
-
-    if(this->increase)
-    {
         //new line
         QDoubleSpinBox* newInput = new QDoubleSpinBox;
         newInput->setSingleStep(0.1);
         this->eq_coef_layout->addWidget(newInput,val-1,0);
         QLabel* newA = new QLabel;
         newA->setText("a");
+        newA->setAlignment(Qt::AlignCenter);
         this->eq_coef_layout->addWidget(newA,val-1,1);
 
-        int pos = 0;
+        int pos;
         for(int i = 2; i < val; i++) //i = column
         {
-            pos = 2*(i-1)+(i-2);
+            pos = 3 * i - 4;
 
 
             QDoubleSpinBox* newSpin = new QDoubleSpinBox;
@@ -120,15 +109,9 @@ void matrix::changeContent(int val)
             newMathSign->setText("+");
             newMathSign->setAlignment(Qt::AlignCenter);
 
-            QLabel* newLetter = new QLabel;
-            QString temp = "";
-            temp.append((char)97+(i-1));
-            newLetter->setText(temp);
-            temp.clear();
-
             this->eq_coef_layout->addWidget(newMathSign,val-1,pos);
             this->eq_coef_layout->addWidget(newSpin,val-1,pos+1);
-            this->eq_coef_layout->addWidget(newLetter,val-1,pos+2);
+            this->eq_coef_layout->addWidget(new QLabel((QString)(96+i)),val-1,pos+2);
         }
 
 
@@ -142,7 +125,7 @@ void matrix::changeContent(int val)
         this->res_layout->addWidget(newRes);
 
 
-        int eq_pos = 2*(val-1)+(val-2);
+        int eq_pos = 3 * val - 4;
 
         for(int i = 0; i < val; i++) //i = row
         {
@@ -198,22 +181,26 @@ void matrix::changeContent(int val)
     {
         //delete last line
         int length = (val+1)*2+(val)+2;
+        QWidget *tmp_widget;
         for(int i = 0; i < length; i++)
         {
             if(i < length-2)
             {
-                if(eq_coef_layout->itemAtPosition(val,i) != NULL)
-                    eq_coef_layout->itemAtPosition(val,i)->widget()->~QWidget();
+                tmp_widget = eq_coef_layout->itemAtPosition(val,i)->widget();
+                eq_coef_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
             }
             else if(i == length-2)
             {
-                if(eq_sign_layout->itemAt(val) != NULL)
-                    eq_sign_layout->itemAt(val)->widget()->~QWidget();
+                tmp_widget = eq_sign_layout->itemAt(val)->widget();
+                eq_sign_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
             }
             else
             {
-                if(res_layout->itemAt(val) != NULL)
-                    res_layout->itemAt(val)->widget()->~QWidget();
+                tmp_widget = res_layout->itemAt(val)->widget();
+                res_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
             }
 
         }
@@ -224,15 +211,21 @@ void matrix::changeContent(int val)
         {
             if((eq_coef_layout->itemAtPosition(i,eq_pos-2) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos-1) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos) != 0))
             {
-                eq_coef_layout->itemAtPosition(i,eq_pos-2)->widget()->~QWidget();
-                eq_coef_layout->itemAtPosition(i,eq_pos-1)->widget()->~QWidget();
-                eq_coef_layout->itemAtPosition(i,eq_pos)->widget()->~QWidget();
+                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos-2)->widget();
+                eq_coef_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
+                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos-1)->widget();
+                eq_coef_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
+                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos)->widget();
+                eq_coef_layout->removeWidget(tmp_widget);
+                delete tmp_widget;
             }
         }
 
         this->adjustSize();
     }
-
+    this->previousValue = val;
 }
 
 

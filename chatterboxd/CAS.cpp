@@ -754,6 +754,7 @@ string CAS::process(string strin) {
 			casinfo.commands.push_back(aexp);
 			VariablesModified = true;
 			FunctionsModified = false;
+			CommandsModified = true;
 			return aexp->getString();
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
@@ -784,13 +785,16 @@ string CAS::process(string strin) {
 			casinfo.commands.push_back(aexp);
 			VariablesModified = false;
 			FunctionsModified = true;
+			CommandsModified = true;
 			return aexp->getString();
 		}
 	} else {
-		ArithmeticExpression *tmpex = ArithmeticExpression::create(strin);;
-		casinfo.commands.push_back(tmpex);
 		VariablesModified = false;
 		FunctionsModified = false;
+		CommandsModified = false;
+		ArithmeticExpression *tmpex = ArithmeticExpression::create(strin);;
+		casinfo.commands.push_back(tmpex);
+		CommandsModified = true;
 		return tmpex->expand(casinfo)->getString();
 	}
 }

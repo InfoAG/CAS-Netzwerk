@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>957</width>
-    <height>641</height>
+    <width>789</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -112,10 +112,13 @@ border-radius: 25px;
                 <widget class="QListWidget" name="userListWidget"/>
                </item>
                <item>
-                <widget class="QListWidget" name="listWidget"/>
+                <widget class="QListWidget" name="functionListWidget"/>
                </item>
                <item>
-                <widget class="QListWidget" name="listWidget_2"/>
+                <widget class="QListWidget" name="variableListWidget"/>
+               </item>
+               <item>
+                <widget class="QListWidget" name="commandListWidget"/>
                </item>
               </layout>
              </item>

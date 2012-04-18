@@ -43,8 +43,8 @@ void ChatterBoxServer::readyRead()
             addUserToScope(client, "global");
             sendScopeList(client);
             sendFunctions(client);
-            sendCommands(client);
             sendVariables(client);
+            sendCommands(client);
         }
         else if(users.contains(client))
         {
@@ -176,6 +176,27 @@ void ChatterBoxServer::sendScopeList(QTcpSocket *socket = NULL) {
     }
 }
 
+void ChatterBoxServer::sendFunctions(QTcpSocket *socket) {
+    QStringList functionList;
+    foreach (Function function, casbyscope[scopebysocket[socket]]->getFunctions())
+        functionList << QString::fromStdString(function.getString());
+    socket->write(QString("fl:" + functionList.join(",")).toUtf8());
+}
+
+void ChatterBoxServer::sendVariables(QTcpSocket*) {
+    QStringList variableList;
+    foreach (Variable variable, casbyscope[scopebysocket[socket]]->getVariables())
+        variableList << QString::fromStdString(variable.getString());
+    socket->write(QString("vl:" + variableList.join(",")).toUtf8());
+}
+
+void ChatterBoxServer::sendCommands(QTcpSocket*) {
+    QStringList commandList;
+    foreach (Command command, casbyscope[scopebysocket[socket]]->getCommands())
+        commandList << QString::fromStdString(command.getString());
+    socket->write(QString("cl:" + commandList.join(",")).toUtf8());
+}
+
 void ChatterBoxServer::addUserToScope(QTcpSocket* socket, QString scope) {
     if (! socketsbyscope.contains(scope)) {
         casbyscope[scope] = new CAS;
@@ -211,5 +232,3 @@ void ChatterBoxServer::deleteScope(QString scope) {
         sendScopeList();
     }
 }
-
-

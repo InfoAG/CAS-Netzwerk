@@ -130,6 +130,16 @@ void MainWindow::readyRead()
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
             stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
 
+        } else if(line.left(line.indexOf(':')) == "fl")
+        {
+                // If so, udpate our functions list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                functionListWidget->clear();
+
+                foreach(QString item, items) {
+                    functionListWidget->addItem(item);
+                }
+
         // Is this a normal chat message:
         } else if(line.left(line.indexOf(':')) == "msg")
         {

@@ -32,18 +32,15 @@ class ChatterBoxServer : public QTcpServer
         QMap<QString, CAS*> casbyscope;
 
         void sendUserListToScope(QList<QTcpSocket*>);
-        void sendScopeList(QTcpSocket *socket);
+        void sendScopeList(QTcpSocket*);
+        void sendFunctions(QTcpSocket*);
+        void sendVariables(QTcpSocket*);
+        void sendCommands(QTcpSocket*);
         void addUserToScope(QTcpSocket*, QString);
         void deleteUser(QTcpSocket*);
         void deleteUserFromScope(QTcpSocket*, QString);
         void changeUserScope(QTcpSocket*, QString);
         void deleteScope(QString);
-        void sendFunctions(QTcpSocket*) const;
-        void sendVariables(QTcpSocket*) const;
-        void sendCommands(QTcpSocket*) const;
-        /*void sendFunctions(QList<QTcpSocket*>) const;
-        void sendVariables(QList<QTcpSocket*>) const;
-        void sendCommands(QList<QTcpSocket*>) const;*/
 };
 
 #endif

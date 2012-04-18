@@ -118,9 +118,19 @@ void ChatterBoxServer::readyRead()
                     otherClient->write(QString("msg:" + scopebysocket[client] + ":" + user + ":" + line + "\n" + message + "\n").toUtf8());
                 QString clientScope = scopebysocket[client];
                 CAS *clientCAS = casbyscope[clientScope];
-                if (clientCAS->functionsModified()) sendFunctions(clientScope);
-                if (clientCAS->variablesModified()) sendVariables(clientScope);
-                if (clientCAS->commandsModified()) sendCommands(clientScope);
+                QList<QTcpSocket*> scopeSockets = socketsbyscope[clientScope];
+                if (clientCAS->functionsModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendFunctions(socket);
+                }
+                if (clientCAS->variablesModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendVariables(socket);
+                }
+                if (clientCAS->commandsModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendCommands(socket);
+                }
 
             } else if (line.left(line.indexOf(':')) == "scope") {
                 QString scopename = line.right(line.length() - line.indexOf(':') - 1);

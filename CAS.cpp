@@ -752,6 +752,8 @@ string CAS::process(string strin) {
 			}
 			casinfo.variables.push_back(Variable(strin.substr(0, pos_assign), aexp));
 			casinfo.commands.push_back(aexp);
+			VariablesModified = true;
+			FunctionsModified = false;
 			return aexp->getString();
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
@@ -780,37 +782,51 @@ string CAS::process(string strin) {
 			}
 			casinfo.functions.push_back(Function(funcname, argvec, aexp));
 			casinfo.commands.push_back(aexp);
+			VariablesModified = false;
+			FunctionsModified = true;
 			return aexp->getString();
 		}
 	} else {
 		ArithmeticExpression *tmpex = ArithmeticExpression::create(strin);;
 		casinfo.commands.push_back(tmpex);
+		VariablesModified = false;
+		FunctionsModified = false;
 		return tmpex->expand(casinfo)->getString();
 	}
 }
 
 void CAS::deleteVariable(string i) {
+	FunctionsModified = false;
 	for (vector<Variable>::iterator it = casinfo.variables.begin(); it != casinfo.variables.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.variables.erase(it);
+			VariablesModified = true;
 			return;
 		}
 	}
+	VariablesModified = false;
 }
 
 void CAS::deleteFunction(string i) {
+	VariablesModified = false;
 	for (vector<Function>::iterator it = casinfo.functions.begin(); it != casinfo.functions.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.functions.erase(it);
+			FunctionsModified = true;
 			return;
 		}
 	}
+	FunctionsModified = false;
 }
 
 void CAS::clearVariables() {
+	FunctionsModified = false;
+	VariablesModified = true;
 	casinfo.variables.clear();
 }
 
 void CAS::clearFunctions() {
+	FunctionsModified = true;
+	VariablesModified = false;
 	casinfo.functions.clear();
 }

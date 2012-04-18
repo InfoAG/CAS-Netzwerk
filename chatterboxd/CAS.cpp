@@ -801,6 +801,7 @@ string CAS::process(string strin) {
 
 void CAS::deleteVariable(string i) {
 	FunctionsModified = false;
+	CommandsModified = false;
 	for (vector<Variable>::iterator it = casinfo.variables.begin(); it != casinfo.variables.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.variables.erase(it);
@@ -813,6 +814,7 @@ void CAS::deleteVariable(string i) {
 
 void CAS::deleteFunction(string i) {
 	VariablesModified = false;
+	CommandsModified = false;
 	for (vector<Function>::iterator it = casinfo.functions.begin(); it != casinfo.functions.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.functions.erase(it);
@@ -826,11 +828,13 @@ void CAS::deleteFunction(string i) {
 void CAS::clearVariables() {
 	FunctionsModified = false;
 	VariablesModified = true;
+	CommandsModified = false;
 	casinfo.variables.clear();
 }
 
 void CAS::clearFunctions() {
 	FunctionsModified = true;
 	VariablesModified = false;
+	CommandsModified = false;
 	casinfo.functions.clear();
 }

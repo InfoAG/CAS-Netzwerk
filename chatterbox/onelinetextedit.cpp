@@ -34,16 +34,9 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
         QTextEdit::keyPressEvent(e);
         QString matrixstr = matrix::MatrixDlg();
         if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();
-        else {
-            this->insertPlainText(matrixstr.left(matrixstr.indexOf(":")) + "]");
-            expandedText += matrixstr;
-        }
-    } else if (e->key() == Qt::Key_Backspace) {
-        expandedText.remove(expandedText.length() - 1, 1);
-        QTextEdit::keyPressEvent(e);
+        else this->insertPlainText(matrixstr + "]");
     } else
-        expandedText += e->text();
-        QTextEdit::keyPressEvent (e);
+        QTextEdit::keyPressEvent(e);
 }
 
 

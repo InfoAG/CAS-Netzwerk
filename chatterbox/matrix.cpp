@@ -24,15 +24,11 @@ matrix::matrix(QWidget *parent) :
     label2->setText("Unbekannten");
     label2->setAlignment(Qt::AlignCenter);
 
-    nameEdit = new QLineEdit;
-    nameEdit->setText("DefaultName");
-
     QHBoxLayout *input_param = new QHBoxLayout;
     input_param->addWidget(spin1);
     input_param->addWidget(label1);
     input_param->addWidget(spin2);
     input_param->addWidget(label2);
-    input_param->addWidget(nameEdit);
 
 
     //initial Equation
@@ -242,7 +238,7 @@ void matrix::changeContent(int val)
 }
 
 QString matrix::getMatrixString() const {
-    QString matrixstr = nameEdit->text() + ":";
+    QString matrixstr;
     for (int i = 0; i < this->currentSize; i++) {
         for (int j = 0; j < this->currentSize; j++) {
             matrixstr += qobject_cast<QDoubleSpinBox *>(this->eq_coef_layout->itemAtPosition(i, j * 3)->widget())->text() + ",";

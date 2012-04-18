@@ -21,8 +21,6 @@ private:
     QVBoxLayout* res_layout; //equation result layout
     QHBoxLayout* eq_layout; //Equation Layout
 
-    QLineEdit *nameEdit;
-
     int currentSize; //holds the current value of the spin1/spin2
     
 signals:

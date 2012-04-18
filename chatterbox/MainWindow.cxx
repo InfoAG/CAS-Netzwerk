@@ -66,7 +66,7 @@ void MainWindow::on_loginButton_clicked()
 void MainWindow::on_sayButton_clicked()
 {
     // What did they want to say (minus white space around the string):
-    QString message = this->sayTextEdit->getExpandedText().trimmed();
+    QString message = this->sayTextEdit->toPlainText().trimmed();
 
     // Only send the text to the chat server if it's not empty:
     if(!message.isEmpty())

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed 18. Apr 17:24:12 2012
+** Created: Wed 18. Apr 19:55:51 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -47,8 +47,9 @@ public:
     QStackedWidget *stackedRooms;
     QVBoxLayout *verticalLayout_3;
     QListWidget *userListWidget;
-    QListWidget *listWidget;
-    QListWidget *listWidget_2;
+    QListWidget *functionListWidget;
+    QListWidget *variableListWidget;
+    QListWidget *commandListWidget;
     QHBoxLayout *horizontalLayout_2;
     OneLineTextEdit *sayTextEdit;
     QPushButton *sayButton;
@@ -71,7 +72,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(957, 641);
+        MainWindow->resize(789, 645);
         MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
         MainWindow->setStyleSheet(QString::fromUtf8("#titleLabel {\n"
 "background: white;\n"
@@ -148,15 +149,20 @@ public:
 
         verticalLayout_3->addWidget(userListWidget);
 
-        listWidget = new QListWidget(chatPage);
-        listWidget->setObjectName(QString::fromUtf8("listWidget"));
+        functionListWidget = new QListWidget(chatPage);
+        functionListWidget->setObjectName(QString::fromUtf8("functionListWidget"));
 
-        verticalLayout_3->addWidget(listWidget);
+        verticalLayout_3->addWidget(functionListWidget);
 
-        listWidget_2 = new QListWidget(chatPage);
-        listWidget_2->setObjectName(QString::fromUtf8("listWidget_2"));
+        variableListWidget = new QListWidget(chatPage);
+        variableListWidget->setObjectName(QString::fromUtf8("variableListWidget"));
 
-        verticalLayout_3->addWidget(listWidget_2);
+        verticalLayout_3->addWidget(variableListWidget);
+
+        commandListWidget = new QListWidget(chatPage);
+        commandListWidget->setObjectName(QString::fromUtf8("commandListWidget"));
+
+        verticalLayout_3->addWidget(commandListWidget);
 
 
         horizontalLayout->addLayout(verticalLayout_3);

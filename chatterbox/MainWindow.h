@@ -8,6 +8,7 @@
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
 #include "roomtextedit.h"
+#include "onelinetextedit.h"
 
 /*
  * This is the MainWindow class that we have told to inherit from
@@ -55,6 +56,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
+
         QListWidgetItem *newScope;
         QString currentScope;
         QMap<QString, QTextEdit*> texteditbyscope;

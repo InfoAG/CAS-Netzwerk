@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed 4. Apr 19:14:53 2012
+** Created: Wed 18. Apr 17:24:12 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -16,6 +16,7 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QFrame>
 #include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
@@ -40,12 +41,17 @@ public:
     QVBoxLayout *verticalLayout_2;
     QStackedWidget *stackedWidget;
     QWidget *chatPage;
-    QGridLayout *gridLayout;
-    QListWidget *userListWidget;
-    QPushButton *sayButton;
+    QVBoxLayout *verticalLayout_4;
+    QHBoxLayout *horizontalLayout;
     QListWidget *scopeListWidget;
     QStackedWidget *stackedRooms;
+    QVBoxLayout *verticalLayout_3;
+    QListWidget *userListWidget;
+    QListWidget *listWidget;
+    QListWidget *listWidget_2;
+    QHBoxLayout *horizontalLayout_2;
     OneLineTextEdit *sayTextEdit;
+    QPushButton *sayButton;
     QWidget *loginPage;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
@@ -65,7 +71,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(800, 600);
+        MainWindow->resize(957, 641);
         MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
         MainWindow->setStyleSheet(QString::fromUtf8("#titleLabel {\n"
 "background: white;\n"
@@ -112,38 +118,57 @@ public:
         stackedWidget->setObjectName(QString::fromUtf8("stackedWidget"));
         chatPage = new QWidget();
         chatPage->setObjectName(QString::fromUtf8("chatPage"));
-        gridLayout = new QGridLayout(chatPage);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        userListWidget = new QListWidget(chatPage);
-        userListWidget->setObjectName(QString::fromUtf8("userListWidget"));
-
-        gridLayout->addWidget(userListWidget, 0, 2, 1, 2);
-
-        sayButton = new QPushButton(chatPage);
-        sayButton->setObjectName(QString::fromUtf8("sayButton"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(sayButton->sizePolicy().hasHeightForWidth());
-        sayButton->setSizePolicy(sizePolicy1);
-        sayButton->setMaximumSize(QSize(60, 16777215));
-
-        gridLayout->addWidget(sayButton, 1, 3, 1, 1);
-
+        verticalLayout_4 = new QVBoxLayout(chatPage);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         scopeListWidget = new QListWidget(chatPage);
         scopeListWidget->setObjectName(QString::fromUtf8("scopeListWidget"));
-        scopeListWidget->setMaximumSize(QSize(100, 16777215));
+        scopeListWidget->setMaximumSize(QSize(16777215, 16777215));
         scopeListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
         scopeListWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
         scopeListWidget->setSortingEnabled(false);
 
-        gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);
+        horizontalLayout->addWidget(scopeListWidget);
 
         stackedRooms = new QStackedWidget(chatPage);
         stackedRooms->setObjectName(QString::fromUtf8("stackedRooms"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(stackedRooms->sizePolicy().hasHeightForWidth());
+        stackedRooms->setSizePolicy(sizePolicy1);
 
-        gridLayout->addWidget(stackedRooms, 0, 1, 1, 1);
+        horizontalLayout->addWidget(stackedRooms);
 
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        userListWidget = new QListWidget(chatPage);
+        userListWidget->setObjectName(QString::fromUtf8("userListWidget"));
+
+        verticalLayout_3->addWidget(userListWidget);
+
+        listWidget = new QListWidget(chatPage);
+        listWidget->setObjectName(QString::fromUtf8("listWidget"));
+
+        verticalLayout_3->addWidget(listWidget);
+
+        listWidget_2 = new QListWidget(chatPage);
+        listWidget_2->setObjectName(QString::fromUtf8("listWidget_2"));
+
+        verticalLayout_3->addWidget(listWidget_2);
+
+
+        horizontalLayout->addLayout(verticalLayout_3);
+
+        horizontalLayout->setStretch(0, 1);
+        horizontalLayout->setStretch(1, 3);
+        horizontalLayout->setStretch(2, 2);
+
+        verticalLayout_4->addLayout(horizontalLayout);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         sayTextEdit = new OneLineTextEdit(chatPage);
         sayTextEdit->setObjectName(QString::fromUtf8("sayTextEdit"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -158,7 +183,21 @@ public:
         sayTextEdit->setTabChangesFocus(true);
         sayTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
-        gridLayout->addWidget(sayTextEdit, 1, 0, 1, 3);
+        horizontalLayout_2->addWidget(sayTextEdit);
+
+        sayButton = new QPushButton(chatPage);
+        sayButton->setObjectName(QString::fromUtf8("sayButton"));
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(sayButton->sizePolicy().hasHeightForWidth());
+        sayButton->setSizePolicy(sizePolicy3);
+        sayButton->setMaximumSize(QSize(60, 16777215));
+
+        horizontalLayout_2->addWidget(sayButton);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_2);
 
         stackedWidget->addWidget(chatPage);
         loginPage = new QWidget();
@@ -175,8 +214,8 @@ public:
 
         loginFrame = new QFrame(loginPage);
         loginFrame->setObjectName(QString::fromUtf8("loginFrame"));
-        sizePolicy1.setHeightForWidth(loginFrame->sizePolicy().hasHeightForWidth());
-        loginFrame->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(loginFrame->sizePolicy().hasHeightForWidth());
+        loginFrame->setSizePolicy(sizePolicy3);
         loginFrame->setMinimumSize(QSize(300, 0));
         loginFrame->setFrameShape(QFrame::StyledPanel);
         gridLayout_2 = new QGridLayout(loginFrame);
@@ -204,8 +243,8 @@ public:
 
         loginButton = new QPushButton(loginFrame);
         loginButton->setObjectName(QString::fromUtf8("loginButton"));
-        sizePolicy1.setHeightForWidth(loginButton->sizePolicy().hasHeightForWidth());
-        loginButton->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(loginButton->sizePolicy().hasHeightForWidth());
+        loginButton->setSizePolicy(sizePolicy3);
 
         gridLayout_2->addWidget(loginButton, 3, 1, 1, 1);
 
@@ -236,9 +275,6 @@ public:
         QWidget::setTabOrder(serverLineEdit, userLineEdit);
         QWidget::setTabOrder(userLineEdit, loginButton);
         QWidget::setTabOrder(loginButton, sayTextEdit);
-        QWidget::setTabOrder(sayTextEdit, sayButton);
-        QWidget::setTabOrder(sayButton, scopeListWidget);
-        QWidget::setTabOrder(scopeListWidget, userListWidget);
 
         retranslateUi(MainWindow);
         QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));

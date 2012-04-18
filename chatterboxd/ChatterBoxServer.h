@@ -38,6 +38,12 @@ class ChatterBoxServer : public QTcpServer
         void deleteUserFromScope(QTcpSocket*, QString);
         void changeUserScope(QTcpSocket*, QString);
         void deleteScope(QString);
+        void sendFunctions(QTcpSocket*) const;
+        void sendVariables(QTcpSocket*) const;
+        void sendCommands(QTcpSocket*) const;
+        /*void sendFunctions(QList<QTcpSocket*>) const;
+        void sendVariables(QList<QTcpSocket*>) const;
+        void sendCommands(QList<QTcpSocket*>) const;*/
 };
 
 #endif

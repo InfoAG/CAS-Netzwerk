@@ -42,6 +42,9 @@ void ChatterBoxServer::readyRead()
                 client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
             addUserToScope(client, "global");
             sendScopeList(client);
+            sendFunctions(client);
+            sendCommands(client);
+            sendVariables(client);
         }
         else if(users.contains(client))
         {

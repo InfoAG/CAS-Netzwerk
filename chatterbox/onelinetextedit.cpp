@@ -32,12 +32,17 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
         button->animateClick();
     } else if (e->key() == Qt::Key_BracketLeft) {
         QTextEdit::keyPressEvent(e);
-
-        matrix MDlg;
-        if (MDlg.exec() == QDialog::Accepted) {
-            //this->append(MDlg.getMatrixString() + "]");
-        } else this->textCursor().deletePreviousChar();
+        QString matrixstr = matrix::MatrixDlg();
+        if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();
+        else {
+            this->insertPlainText(matrixstr.left(matrixstr.indexOf(":")) + "]");
+            expandedText += matrixstr;
+        }
+    } else if (e->key() == Qt::Key_Backspace) {
+        expandedText.remove(expandedText.length() - 1, 1);
+        QTextEdit::keyPressEvent(e);
     } else
+        expandedText += e->text();
         QTextEdit::keyPressEvent (e);
 }
 

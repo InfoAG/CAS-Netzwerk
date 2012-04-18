@@ -4,32 +4,41 @@ matrix::matrix(QWidget *parent) :
     QDialog(parent)
 {
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    this->previousValue = 1;
+    this->currentSize = 1;
 
     //input-parameter
-    spin1 = new QSpinBox;
+    QSpinBox* spin1 = new QSpinBox;
     spin1->setMinimum(1);
     spin1->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     spin1->setKeyboardTracking(false);
-    label1 = new QLabel;
+
+    QLabel* label1 = new QLabel;
     label1->setText("Gleichungen mit");
     label1->setAlignment(Qt::AlignCenter);
-    spin2 = new QSpinBox;
+
+    QSpinBox* spin2 = new QSpinBox;
     spin2->setMinimum(1);
     spin2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    label2 = new QLabel;
+
+    QLabel* label2 = new QLabel;
     label2->setText("Unbekannten");
     label2->setAlignment(Qt::AlignCenter);
-    input_param = new QHBoxLayout;
+
+    nameEdit = new QLineEdit;
+    nameEdit->setText("DefaultName");
+
+    QHBoxLayout *input_param = new QHBoxLayout;
     input_param->addWidget(spin1);
     input_param->addWidget(label1);
     input_param->addWidget(spin2);
     input_param->addWidget(label2);
+    input_param->addWidget(nameEdit);
 
 
     //initial Equation
     QDoubleSpinBox* initial_value = new QDoubleSpinBox;
     initial_value->setSingleStep(0.1);
+    initial_value->setLocale(QLocale::C);
     QLabel* initial_letter = new QLabel;
     QLabel* eq_sign = new QLabel;
     initial_letter->setText("a");
@@ -38,6 +47,7 @@ matrix::matrix(QWidget *parent) :
     eq_sign->setAlignment(Qt::AlignCenter);
     QDoubleSpinBox* initial_result = new QDoubleSpinBox;
     initial_result->setSingleStep(0.1);
+    initial_result->setLocale(QLocale::C);
     eq_coef_layout = new QGridLayout;
     eq_sign_layout = new QVBoxLayout;
     res_layout = new QVBoxLayout;
@@ -51,28 +61,27 @@ matrix::matrix(QWidget *parent) :
     eq_layout->addLayout(res_layout);
 
     //control Buttons
-    quitButton = new QPushButton("Abbrechen");
-    Ok = new QPushButton("Ok");
+    QPushButton *quitButton = new QPushButton("Abbrechen");
+    QPushButton *Ok = new QPushButton("Ok");
     Ok->setDefault(true);
-    button_layout = new QHBoxLayout;
+    QHBoxLayout *button_layout = new QHBoxLayout;
     button_layout->addWidget(Ok);
     button_layout->addWidget(quitButton);
 
 
     //Master-Layout
-    all_layout = new QVBoxLayout;
+    QVBoxLayout *all_layout = new QVBoxLayout;
     all_layout->addLayout(input_param);
     all_layout->addLayout(eq_layout);
     all_layout->addLayout(button_layout);
     setLayout(all_layout);
     setWindowTitle("Matrix");
 
-    setTabOrder(spin1,spin2);
+    /*setTabOrder(spin1,spin2);
     setTabOrder(spin2,initial_value);
     setTabOrder(initial_value,initial_result);
     setTabOrder(initial_result,Ok);
-    setTabOrder(Ok,quitButton);
-    this->first = quitButton;
+    setTabOrder(Ok,quitButton);*/
 
     connect(spin1,SIGNAL(valueChanged(int)),spin2, SLOT(setValue(int)));
     connect(spin1,SIGNAL(valueChanged(int)),this, SLOT(changeContent(int)));
@@ -85,11 +94,12 @@ matrix::matrix(QWidget *parent) :
 
 void matrix::changeContent(int val)
 {
-    if(val > previousValue)
+    if(val > currentSize)
     {
         //new line
         QDoubleSpinBox* newInput = new QDoubleSpinBox;
         newInput->setSingleStep(0.1);
+        newInput->setLocale(QLocale::C);
         this->eq_coef_layout->addWidget(newInput,val-1,0);
         QLabel* newA = new QLabel;
         newA->setText("a");
@@ -104,6 +114,7 @@ void matrix::changeContent(int val)
 
             QDoubleSpinBox* newSpin = new QDoubleSpinBox;
             newSpin->setSingleStep(0.1);
+            newSpin->setLocale(QLocale::C);
 
             QLabel* newMathSign = new QLabel;
             newMathSign->setText("+");
@@ -122,6 +133,7 @@ void matrix::changeContent(int val)
         this->eq_sign_layout->addWidget(newLineEq);
         QDoubleSpinBox* newRes = new QDoubleSpinBox;
         newRes->setSingleStep(0.1);
+        newRes->setLocale(QLocale::C);
         this->res_layout->addWidget(newRes);
 
 
@@ -131,6 +143,7 @@ void matrix::changeContent(int val)
         {
             QDoubleSpinBox* newSpin = new QDoubleSpinBox;
             newSpin->setSingleStep(0.1);
+            newSpin->setLocale(QLocale::C);
 
             QLabel* newMathSign = new QLabel;
             newMathSign->setText("+");
@@ -225,12 +238,27 @@ void matrix::changeContent(int val)
 
         this->adjustSize();
     }
-    this->previousValue = val;
+    this->currentSize = val;
 }
 
-QString matrix::getMatrixString() {
+QString matrix::getMatrixString() const {
+    QString matrixstr = nameEdit->text() + ":";
+    for (int i = 0; i < this->currentSize; i++) {
+        for (int j = 0; j < this->currentSize; j++) {
+            matrixstr += qobject_cast<QDoubleSpinBox *>(this->eq_coef_layout->itemAtPosition(i, j * 3)->widget())->text() + ",";
+        }
+        matrixstr += qobject_cast<QDoubleSpinBox *>(this->res_layout->itemAt(i)->widget())->text();
+        if (i < this->currentSize - 1) matrixstr += "|";
+    }
+    return matrixstr;
+}
+
+QString matrix::MatrixDlg() {
     matrix MDlg;
-    if (MDlg.exec() == QDialog::Accepted) return
+    if (MDlg.exec() == QDialog::Accepted) {
+        return MDlg.getMatrixString();
+    }
+    else return QString();
 }
 
 
@@ -238,7 +266,7 @@ QString matrix::getMatrixString() {
 
 /*void matrix::calc()
 {
-    this->n = this->previousValue;
+    this->n = this->currentSize;
     this->x = new double[this->n];
     for(int i = 0; i < this->n; i ++)
     {

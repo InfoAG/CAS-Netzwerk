@@ -11,11 +11,14 @@ public:
 
     QSize sizeHint() const;
 
+    QString getExpandedText() const { return expandedText; };
+
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
 
 private:
-    QWidget* derp;
+    QWidget* derp; //?!?! :D
+    QString expandedText;
 
 //public slots:
 //    void SyntaxLight();

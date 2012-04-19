@@ -324,7 +324,7 @@ border-radius: 25px;
    <sender>userLineEdit</sender>
    <signal>returnPressed()</signal>
    <receiver>loginButton</receiver>
-   <slot>setFocus()</slot>
+   <slot>animateClick()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>449</x>

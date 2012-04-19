@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 19. Apr 20:58:19 2012
+** Created: Thu 19. Apr 21:07:13 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -255,7 +255,7 @@ public:
         QWidget::setTabOrder(scopeListWidget, userListWidget);
 
         retranslateUi(MainWindow);
-        QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(setFocus()));
+        QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
         stackedWidget->setCurrentIndex(1);
         stackedRooms->setCurrentIndex(-1);

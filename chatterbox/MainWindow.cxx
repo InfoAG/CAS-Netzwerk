@@ -272,12 +272,12 @@ void MainWindow::serverReturnPressed()
 {
     if (portLineEdit->text().isEmpty()) portLineEdit->setFocus();
     else if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
-    else loginButton->setFocus();
+    else loginButton->animateClick();
 }
 
 void MainWindow::portReturnPressed()
 {
     if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
-    else loginButton->setFocus();
+    else loginButton->animateClick();
 }
 

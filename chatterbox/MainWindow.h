@@ -51,13 +51,18 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         void userTextEdited(const QString&);
 
+        void cHistRequested(QKeyEvent*);
     private:
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
+
         QListWidgetItem *newScope;
         QString currentScope;
         QMap<QString, QTextEdit*> texteditbyscope;
+
+        QStringList commandHistory;
+        int cHistPos;
 
         QPropertyAnimation *anim;
 };

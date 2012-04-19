@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 
     connect(scopeListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(customScopeContextMenuRequested(const QPoint&)));
+    connect(sayTextEdit, SIGNAL(cHistRequested(QKeyEvent*)), this, SLOT(cHistRequested(QKeyEvent*)));
 
 }
 
@@ -70,6 +71,10 @@ void MainWindow::on_sayButton_clicked()
     if(!message.isEmpty())
     {
         socket->write(QString("msg:" + message + "\n").toUtf8());
+        if (commandHistory.isEmpty() || message != commandHistory.last()) {
+            commandHistory << message;
+            cHistPos = commandHistory.length();
+        }
     }
 
     // Clear out the input box so they can type something else:
@@ -159,6 +164,7 @@ void MainWindow::connected()
     // And send our username to the chat server.
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
     currentScope = "global";
+    cHistPos = -1;
 }
 
 void MainWindow::disconnected()
@@ -232,6 +238,15 @@ void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
         QMenu *menu = new QMenu(this);
         menu->addAction("Delete Scope", this, SLOT(deleteScope()));
         menu->exec(scopeListWidget->mapToGlobal(pos));
+    }
+}
+
+void MainWindow::cHistRequested(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Up && cHistPos > 0) {
+        sayTextEdit->setText(commandHistory.at(--cHistPos));
+    } else if (e->key() == Qt::Key_Down && cHistPos < commandHistory.length() - 1) {
+        sayTextEdit->setText(commandHistory.at(++cHistPos));
     }
 }
 

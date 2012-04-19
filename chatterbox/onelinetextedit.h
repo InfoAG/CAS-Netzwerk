@@ -20,8 +20,8 @@ private:
 //public slots:
 //    void SyntaxLight();
 
-//signals:4ss4
-//    void textChanged();
+signals:
+    void cHistRequested(QKeyEvent*);
 
 };
 

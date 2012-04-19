@@ -30,9 +30,9 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
     {
         QPushButton *button = this->derp->findChild<QPushButton *>("sayButton");
         button->animateClick();
-    }
-
-    else
+    } else if ((e->key() == Qt::Key_Up) || (e->key() == Qt::Key_Down)) {
+        emit cHistRequested(e);
+    } else
         QTextEdit::keyPressEvent (e);
 }
 

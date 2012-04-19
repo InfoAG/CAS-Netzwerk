@@ -8,6 +8,7 @@
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
 #include "roomtextedit.h"
+#include "onelinetextedit.h"
 
 /*
  * This is the MainWindow class that we have told to inherit from

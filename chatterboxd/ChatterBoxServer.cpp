@@ -116,6 +116,21 @@ void ChatterBoxServer::readyRead()
                 }
                 foreach(QTcpSocket *otherClient, clients)
                     otherClient->write(QString("msg:" + scopebysocket[client] + ":" + user + ":" + line + "\n" + message + "\n").toUtf8());
+                QString clientScope = scopebysocket[client];
+                CAS *clientCAS = casbyscope[clientScope];
+                QList<QTcpSocket*> scopeSockets = socketsbyscope[clientScope];
+                if (clientCAS->functionsModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendFunctions(socket);
+                }
+                if (clientCAS->variablesModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendVariables(socket);
+                }
+                if (clientCAS->commandsModified()) {
+                    foreach (QTcpSocket *socket, scopeSockets)
+                        sendCommands(socket);
+                }
 
             } else if (line.left(line.indexOf(':')) == "scope") {
                 QString scopename = line.right(line.length() - line.indexOf(':') - 1);
@@ -173,6 +188,27 @@ void ChatterBoxServer::sendScopeList(QTcpSocket *socket = NULL) {
     }
 }
 
+void ChatterBoxServer::sendFunctions(QTcpSocket *socket) {
+    QStringList functionList;
+    foreach (Function function, casbyscope[scopebysocket[socket]]->getFunctions())
+        functionList << QString::fromStdString(function.getString());
+    socket->write(QString("fl:" + functionList.join(",") + "\n").toUtf8());
+}
+
+void ChatterBoxServer::sendVariables(QTcpSocket *socket) {
+    QStringList variableList;
+    foreach (Variable variable, casbyscope[scopebysocket[socket]]->getVariables())
+        variableList << QString::fromStdString(variable.getString());
+    socket->write(QString("vl:" + variableList.join(",")).toUtf8() + "\n");
+}
+
+void ChatterBoxServer::sendCommands(QTcpSocket *socket) {
+    QStringList commandList;
+    foreach (Command command, casbyscope[scopebysocket[socket]]->getCommands())
+        commandList << QString::fromStdString(command.getString());
+    socket->write(QString("cl:" + commandList.join(",")).toUtf8() + "\n");
+}
+
 void ChatterBoxServer::addUserToScope(QTcpSocket* socket, QString scope) {
     if (! socketsbyscope.contains(scope)) {
         casbyscope[scope] = new CAS;
@@ -181,6 +217,9 @@ void ChatterBoxServer::addUserToScope(QTcpSocket* socket, QString scope) {
     } else socketsbyscope[scope].push_back(socket);
     scopebysocket[socket] = scope;
     sendUserListToScope(socketsbyscope[scope]);
+    sendFunctions(socket);
+    sendVariables(socket);
+    sendCommands(socket);
 }
 
 void ChatterBoxServer::deleteUser(QTcpSocket* socket) {
@@ -208,5 +247,3 @@ void ChatterBoxServer::deleteScope(QString scope) {
         sendScopeList();
     }
 }
-
-

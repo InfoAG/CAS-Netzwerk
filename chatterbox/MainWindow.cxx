@@ -1,8 +1,4 @@
 #include "MainWindow.h"
-#include "onelinetextedit.h"
-
-// We'll need some regular expression magic in this code:
-#include <QRegExp>
 
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -136,6 +132,34 @@ void MainWindow::readyRead()
             if (! listitembyscope.contains(currentScope)) currentScope = "global";
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
             stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
+
+        } else if(line.left(line.indexOf(':')) == "fl")
+        {
+                // If so, udpate our functions list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                functionListWidget->clear();
+
+                foreach(QString item, items) {
+                    functionListWidget->addItem(item);
+                }
+        } else if(line.left(line.indexOf(':')) == "vl")
+        {
+                // If so, udpate our variables list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                variableListWidget->clear();
+
+                foreach(QString item, items) {
+                    variableListWidget->addItem(item);
+                }
+        } else if(line.left(line.indexOf(':')) == "cl")
+        {
+                // If so, udpate our commands list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                commandListWidget->clear();
+
+                foreach(QString item, items) {
+                    commandListWidget->addItem(item);
+                }
 
         // Is this a normal chat message:
         } else if(line.left(line.indexOf(':')) == "msg")

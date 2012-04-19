@@ -50,6 +50,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void deleteScope();
 
         void userTextEdited(const QString&);
+        void serverReturnPressed();
+        void portReturnPressed();
 
         void cHistRequested(QKeyEvent*);
     private:

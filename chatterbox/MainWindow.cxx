@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(scopeListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(customScopeContextMenuRequested(const QPoint&)));
     connect(sayTextEdit, SIGNAL(cHistRequested(QKeyEvent*)), this, SLOT(cHistRequested(QKeyEvent*)));
+    connect(serverLineEdit, SIGNAL(returnPressed()), this, SLOT(serverReturnPressed()));
+    connect(portLineEdit, SIGNAL(returnPressed()), this, SLOT(portReturnPressed()));
 
 }
 
@@ -55,7 +57,7 @@ void MainWindow::on_loginButton_clicked()
     // get a connected() function call (below). If it fails,
     // we won't get any error message because we didn't connect()
     // to the error() signal from this socket.
-    socket->connectToHost(serverLineEdit->text(), 4200);
+    socket->connectToHost(serverLineEdit->text(), portLineEdit->text().toInt());
     loginButton->setEnabled(false);
     loginButton->setText("connecting");
 }
@@ -264,5 +266,18 @@ void MainWindow::userTextEdited(const QString& text)
         anim->stop();
         anim->start(QAbstractAnimation::KeepWhenStopped);
     }
+}
+
+void MainWindow::serverReturnPressed()
+{
+    if (portLineEdit->text().isEmpty()) portLineEdit->setFocus();
+    else if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
+    else loginButton->setFocus();
+}
+
+void MainWindow::portReturnPressed()
+{
+    if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
+    else loginButton->setFocus();
 }
 

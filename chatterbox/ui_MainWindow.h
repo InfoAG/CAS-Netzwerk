@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 19. Apr 10:50:41 2012
+** Created: Thu 19. Apr 20:58:19 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -58,6 +58,8 @@ public:
     QLineEdit *userLineEdit;
     QPushButton *loginButton;
     QLabel *invalidLabel;
+    QLabel *label_3;
+    QLineEdit *portLineEdit;
     QSpacerItem *horizontalSpacer_2;
     QSpacerItem *verticalSpacer_2;
 
@@ -195,24 +197,35 @@ public:
         label_2 = new QLabel(loginFrame);
         label_2->setObjectName(QString::fromUtf8("label_2"));
 
-        gridLayout_2->addWidget(label_2, 1, 0, 1, 1);
+        gridLayout_2->addWidget(label_2, 2, 0, 1, 1);
 
         userLineEdit = new QLineEdit(loginFrame);
         userLineEdit->setObjectName(QString::fromUtf8("userLineEdit"));
 
-        gridLayout_2->addWidget(userLineEdit, 1, 1, 1, 1);
+        gridLayout_2->addWidget(userLineEdit, 2, 1, 1, 1);
 
         loginButton = new QPushButton(loginFrame);
         loginButton->setObjectName(QString::fromUtf8("loginButton"));
         sizePolicy1.setHeightForWidth(loginButton->sizePolicy().hasHeightForWidth());
         loginButton->setSizePolicy(sizePolicy1);
+        loginButton->setDefault(true);
 
-        gridLayout_2->addWidget(loginButton, 3, 1, 1, 1);
+        gridLayout_2->addWidget(loginButton, 4, 1, 1, 1);
 
         invalidLabel = new QLabel(loginFrame);
         invalidLabel->setObjectName(QString::fromUtf8("invalidLabel"));
 
-        gridLayout_2->addWidget(invalidLabel, 2, 0, 1, 2);
+        gridLayout_2->addWidget(invalidLabel, 3, 0, 1, 2);
+
+        label_3 = new QLabel(loginFrame);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
+
+        portLineEdit = new QLineEdit(loginFrame);
+        portLineEdit->setObjectName(QString::fromUtf8("portLineEdit"));
+
+        gridLayout_2->addWidget(portLineEdit, 1, 1, 1, 1);
 
 
         gridLayout_3->addWidget(loginFrame, 1, 1, 1, 1);
@@ -233,7 +246,8 @@ public:
         verticalLayout->addWidget(mainFrame);
 
         MainWindow->setCentralWidget(centralwidget);
-        QWidget::setTabOrder(serverLineEdit, userLineEdit);
+        QWidget::setTabOrder(serverLineEdit, portLineEdit);
+        QWidget::setTabOrder(portLineEdit, userLineEdit);
         QWidget::setTabOrder(userLineEdit, loginButton);
         QWidget::setTabOrder(loginButton, sayTextEdit);
         QWidget::setTabOrder(sayTextEdit, sayButton);
@@ -241,10 +255,9 @@ public:
         QWidget::setTabOrder(scopeListWidget, userListWidget);
 
         retranslateUi(MainWindow);
-        QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));
-        QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
+        QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(setFocus()));
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(1);
         stackedRooms->setCurrentIndex(-1);
 
 
@@ -260,6 +273,8 @@ public:
         label_2->setText(QApplication::translate("MainWindow", "User name:", 0, QApplication::UnicodeUTF8));
         loginButton->setText(QApplication::translate("MainWindow", "Login", 0, QApplication::UnicodeUTF8));
         invalidLabel->setText(QString());
+        label_3->setText(QApplication::translate("MainWindow", "Server port:", 0, QApplication::UnicodeUTF8));
+        portLineEdit->setText(QApplication::translate("MainWindow", "4200", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

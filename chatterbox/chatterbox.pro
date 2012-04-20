@@ -29,15 +29,17 @@ RESOURCES += images.qrc
 # to these lists as you add new windows, custom widgets, or new
 # functionality:
 
-FORMS   += MainWindow.ui 
+FORMS   += MainWindow.ui
 
 HEADERS += MainWindow.h \  
     onelinetextedit.h \
+    matrix.h \
     syntaxhighlighter.h \
     roomtextedit.h
 
 SOURCES += MainWindow.cxx \
            main.cpp \
+    matrix.cpp \
     onelinetextedit.cpp \
     syntaxhighlighter.cpp \
     roomtextedit.cpp

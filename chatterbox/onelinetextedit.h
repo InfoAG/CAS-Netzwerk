@@ -1,7 +1,12 @@
 #ifndef ONELINETEXTEDIT_H
 #define ONELINETEXTEDIT_H
 
+#include <QKeyEvent>
+#include <QApplication>
+#include <QPushButton>
+#include <QObject>
 #include <QTextEdit>
+#include "syntaxhighlighter.h"
 
 class OneLineTextEdit : public QTextEdit
 {
@@ -15,7 +20,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e);
 
 private:
-    QWidget* derp;
+    QWidget* derp; //?!?! :D
 
 //public slots:
 //    void SyntaxLight();

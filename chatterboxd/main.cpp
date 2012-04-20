@@ -7,16 +7,18 @@ int main(int argc, char **argv)
     ChatterBoxServer *server = new ChatterBoxServer();
     int port;
     QString input;
-    cout << "Port [4200]:\t";
-    input = QTextStream(stdin).readLine();
-
+    QTextStream qtin(stdin);
     bool success;
-    if (input.isEmpty()) success = server->listen(QHostAddress::Any, 4200);
-    else success = server->listen(QHostAddress::Any, input.toInt());
 
-    if(!success)
-    {
-        qFatal("Could not listen on port 4200.");
+    for (;;) {
+        cout << "Port [4200]:\t";
+        input = qtin.readLine();
+
+        if (input.isEmpty()) port = 4200;
+        else port = input.toInt();
+
+        if (server->listen(QHostAddress::Any, port)) break;
+        else qWarning() << "Could not listen on port " << port << "\b. Please try a different one.";
     }
 
     qDebug() << "Ready";

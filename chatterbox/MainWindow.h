@@ -3,12 +3,14 @@
 #include <QTcpSocket>
 #include <QtGui>
 #include <QHostAddress>
+#include <QtGui>
 
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
 #include "roomtextedit.h"
 #include "onelinetextedit.h"
+#include "matrix.h"
 
 /*
  * This is the MainWindow class that we have told to inherit from

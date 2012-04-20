@@ -6,6 +6,7 @@
 #include <QPropertyAnimation>
 #include <QGraphicsEffect>
 #include "onelinetextedit.h"
+#include "matrix.h"
 
 class SyntaxHighlighter: public QSyntaxHighlighter
 {

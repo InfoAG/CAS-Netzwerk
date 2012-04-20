@@ -231,7 +231,7 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
         QMessageBox::information(this, tr("CAS Client"),
                                  tr("The following error occurred: %1.")
                                  .arg(socket->errorString()));
-    } 
+    }
 }
 
 void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
@@ -287,6 +287,7 @@ void MainWindow::userTextEdited(const QString& text)
         invalidLabel->setText("Usernames cannot contain \",\" or \":\".");
         userLineEdit->setText(userLineEdit->text().replace(",", ""));
         userLineEdit->setText(userLineEdit->text().replace(":", ""));
+        QApplication::beep();
         anim->stop();
         anim->start(QAbstractAnimation::KeepWhenStopped);
     }

@@ -1,9 +1,4 @@
 #include "onelinetextedit.h"
-#include "syntaxhighlighter.h"
-#include <QKeyEvent>
-#include <QApplication>
-#include <QPushButton>
-#include <QObject>
 
 OneLineTextEdit::OneLineTextEdit(QWidget* parent) : QTextEdit(parent),derp(parent)
 {
@@ -26,14 +21,19 @@ QSize OneLineTextEdit::sizeHint () const
 
 void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
 {
-    if ((e->key () == Qt::Key_Enter) || (e->key () == Qt::Key_Return))
+    if ((e->key() == Qt::Key_Enter) || (e->key() == Qt::Key_Return))
     {
         QPushButton *button = this->derp->findChild<QPushButton *>("sayButton");
         button->animateClick();
     } else if ((e->key() == Qt::Key_Up) || (e->key() == Qt::Key_Down)) {
         emit cHistRequested(e);
+    } else if (e->key() == Qt::Key_BracketLeft) {
+        QTextEdit::keyPressEvent(e);
+        QString matrixstr = matrix::MatrixDlg();
+        if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();
+        else this->insertPlainText(matrixstr + "]");
     } else
-        QTextEdit::keyPressEvent (e);
+        QTextEdit::keyPressEvent(e);
 }
 
 

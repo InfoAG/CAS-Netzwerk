@@ -53,6 +53,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void deleteScope();
 
         void userTextEdited(const QString&);
+        void portTextEdited(const QString&);
+        void anyTextEdited(const QString&);
         void serverReturnPressed();
         void portReturnPressed();
 

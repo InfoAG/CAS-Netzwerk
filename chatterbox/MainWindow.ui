@@ -308,6 +308,9 @@ border-radius: 25px;
               </item>
               <item row="4" column="1">
                <widget class="QPushButton" name="loginButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>

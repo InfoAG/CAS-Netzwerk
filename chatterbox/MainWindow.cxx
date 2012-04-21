@@ -9,13 +9,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setupUi(this);
 
     connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(userTextEdited(QString)));
+    connect(portLineEdit, SIGNAL(textEdited(QString)), this, SLOT(portTextEdited(QString)));
     invalidLabel->setStyleSheet("QLabel { color : red; }");
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(invalidLabel);
     invalidLabel->setGraphicsEffect(effect);
     anim = new QPropertyAnimation(effect, "opacity");
     anim->setStartValue(1.0);
+    anim->setKeyValueAt(0.5, 1.0);
     anim->setEndValue(0);
-    anim->setDuration(1000);
+    anim->setDuration(2000);
 
     // Make sure that we are showing the login page when we startup:
     stackedWidget->setCurrentWidget(loginPage);
@@ -38,7 +40,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(sayTextEdit, SIGNAL(cHistRequested(QKeyEvent*)), this, SLOT(cHistRequested(QKeyEvent*)));
     connect(serverLineEdit, SIGNAL(returnPressed()), this, SLOT(serverReturnPressed()));
     connect(portLineEdit, SIGNAL(returnPressed()), this, SLOT(portReturnPressed()));
-
+    connect(portLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
+    connect(serverLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
+    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
 }
 
 // This gets called when the loginButton gets clicked:
@@ -291,6 +295,26 @@ void MainWindow::userTextEdited(const QString& text)
         anim->stop();
         anim->start(QAbstractAnimation::KeepWhenStopped);
     }
+}
+
+void MainWindow::portTextEdited(const QString &text)
+{
+    bool isNumber = false;
+    text.toInt(&isNumber);
+    if (! isNumber) {
+        invalidLabel->setText("Ports are numbers. Idiot.");
+        portLineEdit->setText(portLineEdit->text().remove(QRegExp("[^0-9]*")));
+        QApplication::beep();
+        anim->stop();
+        anim->start(QAbstractAnimation::KeepWhenStopped);
+    }
+}
+
+void MainWindow::anyTextEdited(const QString &)
+{
+    if (userLineEdit->text().isEmpty() || portLineEdit->text().isEmpty() || serverLineEdit->text().isEmpty())
+        loginButton->setEnabled(false);
+    else loginButton->setEnabled(true);
 }
 
 void MainWindow::serverReturnPressed()

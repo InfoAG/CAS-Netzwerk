@@ -320,5 +320,5 @@ public:
 	void deleteFunction(string);
 	void clearVariables();
 	void clearFunctions();
-	void reset() { casinfo.commands.clear(); casinfo.functions.clear(); casinfo.variables.clear(); }
+	void reset();
 };

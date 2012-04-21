@@ -838,3 +838,12 @@ void CAS::clearFunctions() {
 	CommandsModified = false;
 	casinfo.functions.clear();
 }
+
+void CAS::reset() {
+	casinfo.functions.clear();
+	casinfo.variables.clear();
+	casinfo.commands.clear();
+	VariablesModified = true;
+	FunctionsModified = true;
+	CommandsModified = true;
+}

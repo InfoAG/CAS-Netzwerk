@@ -107,20 +107,74 @@ border-radius: 25px;
               </widget>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
-               <item>
-                <widget class="QListWidget" name="userListWidget"/>
-               </item>
-               <item>
-                <widget class="QListWidget" name="functionListWidget"/>
-               </item>
-               <item>
-                <widget class="QListWidget" name="variableListWidget"/>
-               </item>
-               <item>
-                <widget class="QListWidget" name="commandListWidget"/>
-               </item>
-              </layout>
+              <widget class="QTabWidget" name="tabWidget">
+               <property name="tabPosition">
+                <enum>QTabWidget::East</enum>
+               </property>
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="userTab">
+                <attribute name="title">
+                 <string>Users</string>
+                </attribute>
+                <widget class="QListWidget" name="userListWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>221</width>
+                   <height>531</height>
+                  </rect>
+                 </property>
+                </widget>
+               </widget>
+               <widget class="QWidget" name="variableTab">
+                <attribute name="title">
+                 <string>Variables</string>
+                </attribute>
+                <widget class="QListWidget" name="variableListWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>221</width>
+                   <height>531</height>
+                  </rect>
+                 </property>
+                </widget>
+               </widget>
+               <widget class="QWidget" name="functionTab">
+                <attribute name="title">
+                 <string>Functions</string>
+                </attribute>
+                <widget class="QListWidget" name="functionListWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>221</width>
+                   <height>531</height>
+                  </rect>
+                 </property>
+                </widget>
+               </widget>
+               <widget class="QWidget" name="commandTab">
+                <attribute name="title">
+                 <string>Commands</string>
+                </attribute>
+                <widget class="QListWidget" name="commandListWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>221</width>
+                   <height>531</height>
+                  </rect>
+                 </property>
+                </widget>
+               </widget>
+              </widget>
              </item>
             </layout>
            </item>

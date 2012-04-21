@@ -39,4 +39,5 @@ chatterboxd/lexer.o
 chatterboxd/main.o
 chatterboxd/moc_ChatterBoxServer.cpp
 chatterboxd/moc_ChatterBoxServer.o
+chatterbox/ui_MainWindow.h
 

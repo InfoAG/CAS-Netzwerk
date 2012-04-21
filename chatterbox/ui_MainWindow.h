@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu 29. Mar 14:37:40 2012
+** Created: Wed 18. Apr 19:28:26 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -24,9 +24,9 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
 #include <QtGui/QStackedWidget>
-#include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <onelinetextedit.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -41,10 +41,11 @@ public:
     QStackedWidget *stackedWidget;
     QWidget *chatPage;
     QGridLayout *gridLayout;
-    QTextEdit *roomTextEdit;
     QListWidget *userListWidget;
-    QLineEdit *sayLineEdit;
     QPushButton *sayButton;
+    QListWidget *scopeListWidget;
+    QStackedWidget *stackedRooms;
+    OneLineTextEdit *sayTextEdit;
     QWidget *loginPage;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
@@ -56,6 +57,7 @@ public:
     QLabel *label_2;
     QLineEdit *userLineEdit;
     QPushButton *loginButton;
+    QLabel *invalidLabel;
     QSpacerItem *horizontalSpacer_2;
     QSpacerItem *verticalSpacer_2;
 
@@ -64,6 +66,7 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(800, 600);
+        MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
         MainWindow->setStyleSheet(QString::fromUtf8("#titleLabel {\n"
 "background: white;\n"
 "color: blue;\n"
@@ -111,21 +114,10 @@ public:
         chatPage->setObjectName(QString::fromUtf8("chatPage"));
         gridLayout = new QGridLayout(chatPage);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        roomTextEdit = new QTextEdit(chatPage);
-        roomTextEdit->setObjectName(QString::fromUtf8("roomTextEdit"));
-        roomTextEdit->setReadOnly(true);
-
-        gridLayout->addWidget(roomTextEdit, 0, 0, 1, 1);
-
         userListWidget = new QListWidget(chatPage);
         userListWidget->setObjectName(QString::fromUtf8("userListWidget"));
 
-        gridLayout->addWidget(userListWidget, 0, 1, 1, 2);
-
-        sayLineEdit = new QLineEdit(chatPage);
-        sayLineEdit->setObjectName(QString::fromUtf8("sayLineEdit"));
-
-        gridLayout->addWidget(sayLineEdit, 1, 0, 1, 2);
+        gridLayout->addWidget(userListWidget, 0, 2, 1, 2);
 
         sayButton = new QPushButton(chatPage);
         sayButton->setObjectName(QString::fromUtf8("sayButton"));
@@ -136,7 +128,37 @@ public:
         sayButton->setSizePolicy(sizePolicy1);
         sayButton->setMaximumSize(QSize(60, 16777215));
 
-        gridLayout->addWidget(sayButton, 1, 2, 1, 1);
+        gridLayout->addWidget(sayButton, 1, 3, 1, 1);
+
+        scopeListWidget = new QListWidget(chatPage);
+        scopeListWidget->setObjectName(QString::fromUtf8("scopeListWidget"));
+        scopeListWidget->setMaximumSize(QSize(100, 16777215));
+        scopeListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+        scopeListWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
+        scopeListWidget->setSortingEnabled(false);
+
+        gridLayout->addWidget(scopeListWidget, 0, 0, 1, 1);
+
+        stackedRooms = new QStackedWidget(chatPage);
+        stackedRooms->setObjectName(QString::fromUtf8("stackedRooms"));
+
+        gridLayout->addWidget(stackedRooms, 0, 1, 1, 1);
+
+        sayTextEdit = new OneLineTextEdit(chatPage);
+        sayTextEdit->setObjectName(QString::fromUtf8("sayTextEdit"));
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(sayTextEdit->sizePolicy().hasHeightForWidth());
+        sayTextEdit->setSizePolicy(sizePolicy2);
+        sayTextEdit->setMaximumSize(QSize(682, 22));
+        sayTextEdit->setFocusPolicy(Qt::StrongFocus);
+        sayTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        sayTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        sayTextEdit->setTabChangesFocus(true);
+        sayTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+
+        gridLayout->addWidget(sayTextEdit, 1, 0, 1, 3);
 
         stackedWidget->addWidget(chatPage);
         loginPage = new QWidget();
@@ -185,7 +207,12 @@ public:
         sizePolicy1.setHeightForWidth(loginButton->sizePolicy().hasHeightForWidth());
         loginButton->setSizePolicy(sizePolicy1);
 
-        gridLayout_2->addWidget(loginButton, 2, 1, 1, 1);
+        gridLayout_2->addWidget(loginButton, 3, 1, 1, 1);
+
+        invalidLabel = new QLabel(loginFrame);
+        invalidLabel->setObjectName(QString::fromUtf8("invalidLabel"));
+
+        gridLayout_2->addWidget(invalidLabel, 2, 0, 1, 2);
 
 
         gridLayout_3->addWidget(loginFrame, 1, 1, 1, 1);
@@ -208,17 +235,17 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         QWidget::setTabOrder(serverLineEdit, userLineEdit);
         QWidget::setTabOrder(userLineEdit, loginButton);
-        QWidget::setTabOrder(loginButton, sayLineEdit);
-        QWidget::setTabOrder(sayLineEdit, sayButton);
-        QWidget::setTabOrder(sayButton, roomTextEdit);
-        QWidget::setTabOrder(roomTextEdit, userListWidget);
+        QWidget::setTabOrder(loginButton, sayTextEdit);
+        QWidget::setTabOrder(sayTextEdit, sayButton);
+        QWidget::setTabOrder(sayButton, scopeListWidget);
+        QWidget::setTabOrder(scopeListWidget, userListWidget);
 
         retranslateUi(MainWindow);
-        QObject::connect(sayLineEdit, SIGNAL(returnPressed()), sayButton, SLOT(animateClick()));
         QObject::connect(serverLineEdit, SIGNAL(returnPressed()), userLineEdit, SLOT(setFocus()));
         QObject::connect(userLineEdit, SIGNAL(returnPressed()), loginButton, SLOT(animateClick()));
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(0);
+        stackedRooms->setCurrentIndex(-1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -232,6 +259,7 @@ public:
         label->setText(QApplication::translate("MainWindow", "Server name:", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "User name:", 0, QApplication::UnicodeUTF8));
         loginButton->setText(QApplication::translate("MainWindow", "Login", 0, QApplication::UnicodeUTF8));
+        invalidLabel->setText(QString());
     } // retranslateUi
 
 };

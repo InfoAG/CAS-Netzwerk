@@ -1,6 +1,6 @@
 #include "MainWindow.h"
+#include "onelinetextedit.h"
 #include "matrix.h"
-#include "ui_matrix.h"
 
 // We'll need some regular expression magic in this code:
 #include <QRegExp>
@@ -13,6 +13,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // in your constructor. This creates and lays out all the widgets
     // on the MainWindow that you setup in Designer.
     setupUi(this);
+
+    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(userTextEdited(QString)));
+    invalidLabel->setStyleSheet("QLabel { color : red; }");
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(invalidLabel);
+    invalidLabel->setGraphicsEffect(effect);
+    anim = new QPropertyAnimation(effect, "opacity");
+    anim->setStartValue(1.0);
+    anim->setEndValue(0);
+    anim->setDuration(1000);
 
     // Make sure that we are showing the login page when we startup:
     stackedWidget->setCurrentWidget(loginPage);
@@ -30,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     //handle disconnect and error signals:
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
+
+    connect(scopeListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(customScopeContextMenuRequested(const QPoint&)));
+
 }
 
 // This gets called when the loginButton gets clicked:
@@ -54,7 +66,7 @@ void MainWindow::on_loginButton_clicked()
 void MainWindow::on_sayButton_clicked()
 {
     // What did they want to say (minus white space around the string):
-    QString message = sayLineEdit->text().trimmed();
+    QString message = this->sayTextEdit->toPlainText().trimmed();
 
     // Only send the text to the chat server if it's not empty:
     if(!message.isEmpty())
@@ -63,10 +75,10 @@ void MainWindow::on_sayButton_clicked()
     }
 
     // Clear out the input box so they can type something else:
-    sayLineEdit->clear();
+    this->sayTextEdit->clear();
 
     // Put the focus back into the input box so they can type again:
-    sayLineEdit->setFocus();
+    this->sayTextEdit->setFocus();
 }
 
 // This function gets called whenever the chat server has sent us some text:
@@ -83,22 +95,57 @@ void MainWindow::readyRead()
         if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
-            QStringList users = line.right(line.length() - line.indexOf(':') - 1).split(",");
+            QStringList users = line.right(line.length() - 3).split(",");
             userListWidget->clear();
-            new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
-            foreach(QString user, users)
-                new QListWidgetItem(QPixmap(":/user.png"), user, userListWidget);
-        } else if(line.left(line.indexOf(':')) == "scope") titleLabel->setText("CAS Client (" + line.right(line.length() - line.indexOf(':') - 1) + ")");
+            QListWidgetItem *lwi = new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
+            lwi->setToolTip(socket->peerAddress().toString());
+
+            int pos;
+            foreach(QString user, users) {
+                pos = user.indexOf(":");
+                lwi = new QListWidgetItem(QPixmap(":/user.png"), user.left(pos), userListWidget);
+                lwi->setToolTip(user.right(user.length() - pos - 1));
+            }
+
+        } else if(line.left(line.indexOf(':')) == "sl") //scope list update
+        {
+            // If so, udpate our scope list on the left:
+            QStringList scopes = line.right(line.length() - 3).split(",");
+            scopeListWidget->clear();
+            QMap<QString, QListWidgetItem*> listitembyscope;
+            foreach(QString scope, scopes) {
+                QListWidgetItem *lwi = new QListWidgetItem(scope);
+                listitembyscope[scope] = lwi;
+                scopeListWidget->addItem(lwi);
+                if (! texteditbyscope.contains(scope)) {
+                    QTextEdit *te = new roomTextEdit;
+                    te->setReadOnly(true);
+                    texteditbyscope[scope] = te;
+                    stackedRooms->addWidget(te);
+                }
+            }
+            newScope = new QListWidgetItem("New Scope");
+            newScope->setFlags(newScope->flags() | Qt::ItemIsEditable);
+            scopeListWidget->sortItems();
+            scopeListWidget->addItem(newScope);
+            if (! listitembyscope.contains(currentScope)) currentScope = "global";
+            scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
+            stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
+
         // Is this a normal chat message:
-        else if(line.left(line.indexOf(':')) == "msg")
+        } else if(line.left(line.indexOf(':')) == "msg")
         {
             // If so, append this message to our chat box:
-            int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1);
-            QString user = line.mid(posfirst + 1, possecond - 4);
-            QString message = line.right(line.length() - possecond - 1);
+            int posfirst = line.indexOf(':'), possecond = line.indexOf(':', posfirst + 1), posthird = line.indexOf(':', possecond + 1);
+            QString scope = line.mid(posfirst + 1, possecond - 4);
+            QString user = line.mid(possecond + 1, posthird - possecond - 1);
+            QString message = line.right(line.length() - posthird - 1);
 
-            roomTextEdit->append("<b>" + user + "</b>: " + message);
-        } else roomTextEdit->append(line);
+            if (scope.isEmpty()) {
+                foreach (QTextEdit *te, texteditbyscope.values())
+                    te->append("<b>" + user + "</b>: " + message);
+            } else texteditbyscope[scope]->append("<b>" + user + "</b>: " + message);
+        }
     }
 }
 
@@ -108,13 +155,18 @@ void MainWindow::connected()
 {
     // Flip over to the chat page:
     stackedWidget->setCurrentWidget(chatPage);
+    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
 
     // And send our username to the chat server.
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
+    currentScope = "global";
 }
 
 void MainWindow::disconnected()
 {
+    texteditbyscope.clear();
+
     //prepare loginPage:
     loginButton->setText("Login");
     loginButton->setEnabled(true);
@@ -152,15 +204,52 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError)
     }
 }
 
-
-
-void MainWindow::on_sayLineEdit_textChanged(const QString &arg1)
-{
-    if (sayLineEdit->text().right(1) == "[")
-    {
-        this->Ui_MainWindow.sayLineEdit
-        Matrix* matrix = new Matrix;
-        matrix->show();
-
+void MainWindow::currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous) {
+    if ((! (previous == NULL && current->text() == "global")) && current != NULL && current != newScope) {
+        userListWidget->clear();
+        socket->write(QString("scope:" + current->text() + "\n").toUtf8());
+        stackedRooms->setCurrentWidget(texteditbyscope[current->text()]);
+        currentScope = current->text();
     }
 }
+
+void MainWindow::itemChanged(QListWidgetItem* item) {
+    if (item == newScope) {
+        if (item->text().isEmpty()) item->setText("New Scope");
+        else if (item->text().contains(",") || item->text().contains(":")) {
+            item->setText("New Scope");
+            QMessageBox::information(this, "New Scope", "Scope names cannot contain \",\" or \":\". Please choose a different name.");
+        }
+        else if (item->text() != "New Scope") {
+            socket->write(QString("scope:" + item->text() + "\n").toUtf8());
+            currentScope = item->text();
+        }
+    }
+}
+
+void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
+{
+    QListWidgetItem *under = scopeListWidget->itemAt(pos);
+    if(under && under != newScope && under->text() != "global") {
+        QMenu *menu = new QMenu(this);
+        menu->addAction("Delete Scope", this, SLOT(deleteScope()));
+        menu->exec(scopeListWidget->mapToGlobal(pos));
+    }
+}
+
+void MainWindow::deleteScope()
+{
+    socket->write(QString("ds:" + scopeListWidget->currentItem()->text() + "\n").toUtf8());
+}
+
+void MainWindow::userTextEdited(const QString& text)
+{
+    if (text.contains(",") || text.contains(":")) {
+        invalidLabel->setText("Usernames cannot contain \",\" or \":\".");
+        userLineEdit->setText(userLineEdit->text().replace(",", ""));
+        userLineEdit->setText(userLineEdit->text().replace(":", ""));
+        anim->stop();
+        anim->start(QAbstractAnimation::KeepWhenStopped);
+    }
+}
+

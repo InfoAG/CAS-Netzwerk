@@ -1,10 +1,13 @@
 // We need to include a couple Qt classes that we'll use:
 #include <QMainWindow>
 #include <QTcpSocket>
+#include <QtGui>
+#include <QHostAddress>
 
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
+#include "roomtextedit.h"
 
 /*
  * This is the MainWindow class that we have told to inherit from
@@ -41,12 +44,20 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void disconnected();
         void displayError(QAbstractSocket::SocketError);
 
+        void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+        void itemChanged(QListWidgetItem*);
+        void customScopeContextMenuRequested(const QPoint&);
+        void deleteScope();
 
+        void userTextEdited(const QString&);
 
-        void on_sayLineEdit_textChanged(const QString &arg1);
-
-private:
+    private:
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
+        QListWidgetItem *newScope;
+        QString currentScope;
+        QMap<QString, QTextEdit*> texteditbyscope;
+
+        QPropertyAnimation *anim;
 };

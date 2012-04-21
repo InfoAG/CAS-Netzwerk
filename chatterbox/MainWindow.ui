@@ -10,6 +10,9 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>CAS Client</string>
   </property>
@@ -69,20 +72,10 @@ border-radius: 25px;
          </property>
          <widget class="QWidget" name="chatPage">
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QTextEdit" name="roomTextEdit">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="2">
+           <item row="0" column="2" colspan="2">
             <widget class="QListWidget" name="userListWidget"/>
            </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QLineEdit" name="sayLineEdit"/>
-           </item>
-           <item row="1" column="2">
+           <item row="1" column="3">
             <widget class="QPushButton" name="sayButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -98,6 +91,63 @@ border-radius: 25px;
              </property>
              <property name="text">
               <string>Process</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QListWidget" name="scopeListWidget">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::AllEditTriggers</set>
+             </property>
+             <property name="sortingEnabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QStackedWidget" name="stackedRooms">
+             <property name="currentIndex">
+              <number>-1</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="OneLineTextEdit" name="sayTextEdit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>682</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="tabChangesFocus">
+              <bool>true</bool>
+             </property>
+             <property name="lineWrapMode">
+              <enum>QTextEdit::NoWrap</enum>
              </property>
             </widget>
            </item>
@@ -175,7 +225,7 @@ border-radius: 25px;
               <item row="1" column="1">
                <widget class="QLineEdit" name="userLineEdit"/>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <widget class="QPushButton" name="loginButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -185,6 +235,13 @@ border-radius: 25px;
                 </property>
                 <property name="text">
                  <string>Login</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="QLabel" name="invalidLabel">
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -227,33 +284,24 @@ border-radius: 25px;
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>OneLineTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">onelinetextedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>serverLineEdit</tabstop>
   <tabstop>userLineEdit</tabstop>
   <tabstop>loginButton</tabstop>
-  <tabstop>sayLineEdit</tabstop>
+  <tabstop>sayTextEdit</tabstop>
   <tabstop>sayButton</tabstop>
-  <tabstop>roomTextEdit</tabstop>
+  <tabstop>scopeListWidget</tabstop>
   <tabstop>userListWidget</tabstop>
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>sayLineEdit</sender>
-   <signal>returnPressed()</signal>
-   <receiver>sayButton</receiver>
-   <slot>animateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>331</x>
-     <y>564</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>768</x>
-     <y>570</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>serverLineEdit</sender>
    <signal>returnPressed()</signal>
@@ -261,12 +309,12 @@ border-radius: 25px;
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>391</x>
-     <y>188</y>
+     <x>110</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>470</x>
-     <y>238</y>
+     <x>110</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -277,12 +325,12 @@ border-radius: 25px;
    <slot>animateClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>417</x>
-     <y>239</y>
+     <x>110</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>389</x>
-     <y>275</y>
+     <x>110</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>

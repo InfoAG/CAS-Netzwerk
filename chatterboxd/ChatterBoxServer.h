@@ -27,6 +27,7 @@ class ChatterBoxServer : public QTcpServer
     private:
         QSet<QTcpSocket*> clients;
         QMap<QTcpSocket*,QString> users;
+        QList<QString> usernames;
         QMap<QString, QList<QTcpSocket*> > socketsbyscope;
         QMap<QTcpSocket*, QString> scopebysocket;
         QMap<QString, CAS*> casbyscope;

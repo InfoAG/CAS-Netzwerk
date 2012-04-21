@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(portLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
     connect(serverLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
     connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
+    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
 }
 
 // This gets called when the loginButton gets clicked:
@@ -96,8 +98,15 @@ void MainWindow::readyRead()
         // that non-English speakers can chat in their native language)
         QString line = QString::fromUtf8(socket->readLine()).trimmed();
 
+        if (line == "chokai") {
+            // Flip over to the chat page:
+            stackedWidget->setCurrentWidget(chatPage);
+        } else if (line == "inuse") {
+            socket->disconnectFromHost();
+            QMessageBox::information(this, "CAS Client", "The username \"" + userLineEdit->text() + "\" is already in use. Please choose a different one.");
+
         // Is this a user list message:
-        if(line.left(line.indexOf(':')) == "ul")
+        }else if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
             QStringList users = line.right(line.length() - 3).split(",");
@@ -186,11 +195,6 @@ void MainWindow::readyRead()
 // server. (see the connect() call in the MainWindow constructor).
 void MainWindow::connected()
 {
-    // Flip over to the chat page:
-    stackedWidget->setCurrentWidget(chatPage);
-    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
-    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
-
     // And send our username to the chat server.
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
     currentScope = "global";

@@ -35,13 +35,17 @@ void ChatterBoxServer::readyRead()
         {
             //username:
             QString user = line.right(line.length() - line.indexOf(':') - 1);
-            //add user to socket/user list:
-            users[client] = user;
-            //send "new user"-message to all clients:
-            foreach(QTcpSocket *client, clients)
-                client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
-            addUserToScope(client, "global");
-            sendScopeList(client);
+            if (! usernames.contains(user)) {
+                //add user to socket/user list:
+                users[client] = user;
+                usernames.push_back(user);
+                //send "new user"-message to all clients:
+                foreach(QTcpSocket *client, clients)
+                    client->write(QString("msg::Server:" + user + " has joined.\n").toUtf8());
+                addUserToScope(client, "global");
+                sendScopeList(client);
+                client->write(QString("chokai\n").toUtf8());
+            } else client->write(QString("inuse\n").toUtf8());
         }
         else if(users.contains(client))
         {
@@ -158,6 +162,7 @@ void ChatterBoxServer::disconnected()
 
     QString user = users[client];
     users.remove(client);
+    usernames.removeOne(user);
 
     deleteUser(client);
     //send message to clients:

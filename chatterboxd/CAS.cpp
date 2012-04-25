@@ -290,11 +290,17 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	ArithmeticExpression *al = left->expand(ei);
 	ArithmeticExpression *ar = right->expand(ei);
 	Division *dp;
+	Addition *ap;
 	NumericalValue *nl = dynamic_cast<NumericalValue*>(al), *nr = dynamic_cast<NumericalValue*>(ar);
 	if (nl && nr) return new NumericalValue(nl->value / nr->value);
 	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left, new Multiplication(dp->right, ar)).expand(ei);
 	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right), dp->left).expand(ei);
-	else {
+	else if (ap = dynamic_cast<Addition*>(al)) {
+		list<ArithmeticExpression*> res;
+		for (list<ArithmeticExpression*>::iterator it = ap->operands.begin(); it != ap->operands.end(); ++it)
+			res.push_back(Division(*it, ar).expand(ei));
+		return new Addition(res);
+	} else {
 		return new Division(al, ar);
 		/*list<ArithmeticExpression*> explist;
 		list<ArithmeticExpression*> reslist;

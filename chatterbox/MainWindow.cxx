@@ -284,9 +284,15 @@ void MainWindow::cHistRequested(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Up && cHistPos > 0) {
         sayTextEdit->setText(commandHistory.at(--cHistPos));
-    } else if (e->key() == Qt::Key_Down && cHistPos < commandHistory.length() - 1) {
-        sayTextEdit->setText(commandHistory.at(++cHistPos));
+    } else if (e->key() == Qt::Key_Down) {
+        if (cHistPos == commandHistory.length() - 1) {
+            sayTextEdit->setText("");
+            ++cHistPos;
+        } else if (cHistPos < commandHistory.length() - 1) sayTextEdit->setText(commandHistory.at(++cHistPos));
     }
+    QTextCursor cursor = sayTextEdit->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    sayTextEdit->setTextCursor(cursor);
 }
 
 void MainWindow::deleteScope()

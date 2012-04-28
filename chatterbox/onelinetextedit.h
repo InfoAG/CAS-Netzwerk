@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QTextEdit>
 #include "syntaxhighlighter.h"
+#include "simpsongui.h"
 
 class OneLineTextEdit : public QTextEdit
 {
@@ -22,8 +23,8 @@ protected:
 private:
     QWidget* derp; //?!?! :D
 
-//public slots:
-//    void SyntaxLight();
+private slots:
+    void textChanged();
 
 signals:
     void cHistRequested(QKeyEvent*);

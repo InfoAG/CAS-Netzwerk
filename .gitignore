@@ -41,3 +41,4 @@ chatterboxd/moc_ChatterBoxServer.cpp
 chatterboxd/moc_ChatterBoxServer.o
 *.orig
 chatterbox/ui_MainWindow.h
+chatterbox/ui_simpsongui.h

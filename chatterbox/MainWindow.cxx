@@ -150,6 +150,7 @@ void MainWindow::readyRead()
                 if (! texteditbyscope.contains(scope)) {
                     QTextEdit *te = new roomTextEdit;
                     te->setReadOnly(true);
+                    te->installEventFilter(this);
                     texteditbyscope[scope] = te;
                     stackedRooms->addWidget(te);
                 }
@@ -304,6 +305,39 @@ void MainWindow::cHistRequested(QKeyEvent *e)
     QTextCursor cursor = sayTextEdit->textCursor();
     cursor.movePosition(QTextCursor::End);
     sayTextEdit->setTextCursor(cursor);
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == stackedRooms->currentWidget()) {
+        if (event->type() == QEvent::ToolTip) {
+            QHelpEvent *helpEvent = static_cast<QHelpEvent*>(event);
+            QTextCursor cursor = static_cast<QTextEdit*>(obj)->cursorForPosition(helpEvent->pos());
+            cursor.select(QTextCursor::WordUnderCursor); //problem: needs whitespaces around expression; no syntax checking
+            int posEqual;
+
+            foreach (QListWidgetItem *widget, functionListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
+                posEqual = widget->text().indexOf("=");
+                if (widget->text().left(posEqual) == cursor.selectedText()) {
+                    QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - posEqual - 1));
+                    return true;
+                }
+            }
+
+            foreach (QListWidgetItem *widget,  variableListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
+                posEqual = widget->text().indexOf("=");
+                if (widget->text().left(posEqual) == cursor.selectedText()) {
+                    QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - posEqual - 1));
+                    return true;
+                }
+            }
+
+            //TODO: commands $n -> nth command's value
+
+            QToolTip::hideText();
+            return true;
+        } else return false;
+    } else return QMainWindow::eventFilter(obj, event);
 }
 
 void MainWindow::deleteScope()

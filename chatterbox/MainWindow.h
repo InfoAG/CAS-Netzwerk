@@ -1,4 +1,4 @@
-//#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
+#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
 
 #ifdef AUTOCONNECT
 #include <qglobal.h>
@@ -66,6 +66,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void portReturnPressed();
 
         void cHistRequested(QKeyEvent*);
+
+        bool eventFilter(QObject *, QEvent *);
     private:
 
         // This is the socket that will let us communitate with the server.

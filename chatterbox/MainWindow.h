@@ -1,13 +1,23 @@
+//#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
+
+#ifdef AUTOCONNECT
+#include <qglobal.h>
+#include <time.h>
+#endif //AUTOCONNECT
+
 // We need to include a couple Qt classes that we'll use:
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QtGui>
 #include <QHostAddress>
+#include <QtGui>
 
 // This is the include file that Qt generates for us from the
 // GUI we built in Designer  
 #include "ui_MainWindow.h"
 #include "roomtextedit.h"
+#include "onelinetextedit.h"
+#include "matrix.h"
 
 /*
  * This is the MainWindow class that we have told to inherit from
@@ -49,15 +59,24 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void customScopeContextMenuRequested(const QPoint&);
         void deleteScope();
 
-        void userTextEdited(const QString&);
+        void userTextChanged(const QString&);
+        void portTextChanged(const QString&);
+        void anyTextChanged(const QString&);
+        void serverReturnPressed();
+        void portReturnPressed();
 
+        void cHistRequested(QKeyEvent*);
     private:
 
         // This is the socket that will let us communitate with the server.
         QTcpSocket *socket;
+
         QListWidgetItem *newScope;
         QString currentScope;
         QMap<QString, QTextEdit*> texteditbyscope;
+
+        QStringList commandHistory;
+        int cHistPos;
 
         QPropertyAnimation *anim;
 };

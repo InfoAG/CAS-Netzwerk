@@ -1,7 +1,13 @@
 #ifndef ONELINETEXTEDIT_H
 #define ONELINETEXTEDIT_H
 
+#include <QKeyEvent>
+#include <QApplication>
+#include <QPushButton>
+#include <QObject>
 #include <QTextEdit>
+#include "syntaxhighlighter.h"
+#include "simpsongui.h"
 
 class OneLineTextEdit : public QTextEdit
 {
@@ -17,11 +23,11 @@ protected:
 private:
     QWidget* derp; //?!?! :D
 
-//public slots:
-//    void SyntaxLight();
+private slots:
+    void textChanged();
 
-//signals:4ss4
-//    void textChanged();
+signals:
+    void cHistRequested(QKeyEvent*);
 
 };
 

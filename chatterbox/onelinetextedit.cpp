@@ -1,9 +1,4 @@
 #include "onelinetextedit.h"
-#include "syntaxhighlighter.h"
-#include <QKeyEvent>
-#include <QApplication>
-#include <QPushButton>
-#include <QObject>
 
 OneLineTextEdit::OneLineTextEdit(QWidget* parent) : QTextEdit(parent),derp(parent)
 {
@@ -13,6 +8,7 @@ OneLineTextEdit::OneLineTextEdit(QWidget* parent) : QTextEdit(parent),derp(paren
     setTabChangesFocus (true);
     setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
     new SyntaxHighlighter(this->document());
+    connect(this, SIGNAL(textChanged()), this, SLOT(textChanged()));
 }
 
 QSize OneLineTextEdit::sizeHint () const
@@ -30,6 +26,8 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
     {
         QPushButton *button = this->derp->findChild<QPushButton *>("sayButton");
         button->animateClick();
+    } else if ((e->key() == Qt::Key_Up) || (e->key() == Qt::Key_Down)) {
+        emit cHistRequested(e);
     } else if (e->key() == Qt::Key_BracketLeft) {
         QTextEdit::keyPressEvent(e);
         QString matrixstr = matrix::MatrixDlg();
@@ -39,6 +37,15 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
         QTextEdit::keyPressEvent(e);
 }
 
+void OneLineTextEdit::textChanged()
+{
+    if (this->toPlainText().endsWith("integrate("))
+    {
+        QString simpsonstr = SimpsonGui::SimpsonDlg();
+        if (simpsonstr.isEmpty()) this->setText(this->toPlainText().left(this->toPlainText().length() - 10));
+        else this->insertPlainText(simpsonstr + ")");
+    }
+}
 
 
 //void OneLineTextEdit::SyntaxLight()

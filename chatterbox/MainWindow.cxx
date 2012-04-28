@@ -1,10 +1,4 @@
 #include "MainWindow.h"
-#include "onelinetextedit.h"
-#include "matrix.h"
-
-// We'll need some regular expression magic in this code:
-#include <QRegExp>
-#include <QtGui>
 
 // This is our MainWindow constructor (you C++ n00b)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -14,14 +8,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // on the MainWindow that you setup in Designer.
     setupUi(this);
 
-    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(userTextEdited(QString)));
+    connect(userLineEdit, SIGNAL(textChanged(QString)), this, SLOT(userTextChanged(QString)));
+    connect(portLineEdit, SIGNAL(textChanged(QString)), this, SLOT(portTextChanged(QString)));
     invalidLabel->setStyleSheet("QLabel { color : red; }");
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(invalidLabel);
     invalidLabel->setGraphicsEffect(effect);
     anim = new QPropertyAnimation(effect, "opacity");
     anim->setStartValue(1.0);
+    anim->setKeyValueAt(0.5, 1.0);
     anim->setEndValue(0);
-    anim->setDuration(1000);
+    anim->setDuration(2000);
 
     // Make sure that we are showing the login page when we startup:
     stackedWidget->setCurrentWidget(loginPage);
@@ -41,7 +37,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 
     connect(scopeListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(customScopeContextMenuRequested(const QPoint&)));
+    connect(sayTextEdit, SIGNAL(cHistRequested(QKeyEvent*)), this, SLOT(cHistRequested(QKeyEvent*)));
+    connect(serverLineEdit, SIGNAL(returnPressed()), this, SLOT(serverReturnPressed()));
+    connect(portLineEdit, SIGNAL(returnPressed()), this, SLOT(portReturnPressed()));
+    connect(portLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
+    connect(serverLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
+    connect(userLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
+    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
 
+#ifdef AUTOCONNECT
+    serverLineEdit->setText("localhost");
+    qsrand((uint)QTime::currentTime().msec());
+    userLineEdit->setText("user" + QString::number(qrand()));
+    loginButton->click();
+#endif //AUTOCONNECT
 }
 
 // This gets called when the loginButton gets clicked:
@@ -56,9 +66,14 @@ void MainWindow::on_loginButton_clicked()
     // get a connected() function call (below). If it fails,
     // we won't get any error message because we didn't connect()
     // to the error() signal from this socket.
-    socket->connectToHost(serverLineEdit->text(), 4200);
-    loginButton->setEnabled(false);
-    loginButton->setText("connecting");
+    if (userLineEdit->text() == "CAS") {
+        QMessageBox::information(this, "CAS Client", "I'm pretty sure you're overestimating your math skills.\n"
+                                                     "If you are a computer or alien and interested in a job, contact \"InfoAG\" on github.");
+    } else {
+        socket->connectToHost(serverLineEdit->text(), portLineEdit->text().toInt());
+        loginButton->setEnabled(false);
+        loginButton->setText("connecting");
+    }
 }
 
 // This gets called when the user clicks the sayButton (next to where
@@ -72,6 +87,10 @@ void MainWindow::on_sayButton_clicked()
     if(!message.isEmpty())
     {
         socket->write(QString("msg:" + message + "\n").toUtf8());
+        if (commandHistory.isEmpty() || message != commandHistory.last()) {
+            commandHistory << message;
+            cHistPos = commandHistory.length();
+        }
     }
 
     // Clear out the input box so they can type something else:
@@ -91,8 +110,19 @@ void MainWindow::readyRead()
         // that non-English speakers can chat in their native language)
         QString line = QString::fromUtf8(socket->readLine()).trimmed();
 
+        if (line == "chokai") {
+            // Flip over to the chat page:
+            stackedWidget->setCurrentWidget(chatPage);
+        } else if (line == "inuse") {
+            socket->disconnectFromHost();
+#ifdef AUTOCONNECT
+            userLineEdit->setText("user" + QString::number(qrand()));
+            loginButton->click();
+#else
+            QMessageBox::information(this, "CAS Client", "The username \"" + userLineEdit->text() + "\" is already in use. Please choose a different one.");
+#endif //AUTOCONNECT
         // Is this a user list message:
-        if(line.left(line.indexOf(':')) == "ul")
+        }else if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
             QStringList users = line.right(line.length() - 3).split(",");
@@ -132,6 +162,34 @@ void MainWindow::readyRead()
             scopeListWidget->setCurrentItem(listitembyscope[currentScope]);
             stackedRooms->setCurrentWidget(texteditbyscope[currentScope]);
 
+        } else if(line.left(line.indexOf(':')) == "fl")
+        {
+                // If so, udpate our functions list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                functionListWidget->clear();
+
+                foreach(QString item, items) {
+                    functionListWidget->addItem(item);
+                }
+        } else if(line.left(line.indexOf(':')) == "vl")
+        {
+                // If so, udpate our variables list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                variableListWidget->clear();
+
+                foreach(QString item, items) {
+                    variableListWidget->addItem(item);
+                }
+        } else if(line.left(line.indexOf(':')) == "cl")
+        {
+                // If so, udpate our commands list on the right:
+                QStringList items = line.right(line.length() - 3).split(",");
+                commandListWidget->clear();
+
+                foreach(QString item, items) {
+                    commandListWidget->addItem(item);
+                }
+
         // Is this a normal chat message:
         } else if(line.left(line.indexOf(':')) == "msg")
         {
@@ -153,14 +211,10 @@ void MainWindow::readyRead()
 // server. (see the connect() call in the MainWindow constructor).
 void MainWindow::connected()
 {
-    // Flip over to the chat page:
-    stackedWidget->setCurrentWidget(chatPage);
-    connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
-    connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
-
     // And send our username to the chat server.
     socket->write(QString("me:" + userLineEdit->text() + "\n").toUtf8());
     currentScope = "global";
+    cHistPos = -1;
 }
 
 void MainWindow::disconnected()
@@ -237,19 +291,68 @@ void MainWindow::customScopeContextMenuRequested(const QPoint &pos)
     }
 }
 
+void MainWindow::cHistRequested(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Up && cHistPos > 0) {
+        sayTextEdit->setText(commandHistory.at(--cHistPos));
+    } else if (e->key() == Qt::Key_Down) {
+        if (cHistPos == commandHistory.length() - 1) {
+            sayTextEdit->setText("");
+            ++cHistPos;
+        } else if (cHistPos < commandHistory.length() - 1) sayTextEdit->setText(commandHistory.at(++cHistPos));
+    }
+    QTextCursor cursor = sayTextEdit->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    sayTextEdit->setTextCursor(cursor);
+}
+
 void MainWindow::deleteScope()
 {
     socket->write(QString("ds:" + scopeListWidget->currentItem()->text() + "\n").toUtf8());
 }
 
-void MainWindow::userTextEdited(const QString& text)
+void MainWindow::userTextChanged(const QString& text)
 {
     if (text.contains(",") || text.contains(":")) {
         invalidLabel->setText("Usernames cannot contain \",\" or \":\".");
         userLineEdit->setText(userLineEdit->text().replace(",", ""));
         userLineEdit->setText(userLineEdit->text().replace(":", ""));
+        QApplication::beep();
         anim->stop();
         anim->start(QAbstractAnimation::KeepWhenStopped);
     }
+}
+
+void MainWindow::portTextChanged(const QString &text)
+{
+    bool isNumber = false;
+    text.toInt(&isNumber);
+    if (! isNumber) {
+        invalidLabel->setText("Ports are numbers. Idiot.");
+        portLineEdit->setText(portLineEdit->text().remove(QRegExp("[^0-9]*")));
+        QApplication::beep();
+        anim->stop();
+        anim->start(QAbstractAnimation::KeepWhenStopped);
+    }
+}
+
+void MainWindow::anyTextChanged(const QString &)
+{
+    if (userLineEdit->text().isEmpty() || portLineEdit->text().isEmpty() || serverLineEdit->text().isEmpty())
+        loginButton->setEnabled(false);
+    else loginButton->setEnabled(true);
+}
+
+void MainWindow::serverReturnPressed()
+{
+    if (portLineEdit->text().isEmpty()) portLineEdit->setFocus();
+    else if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
+    else loginButton->animateClick();
+}
+
+void MainWindow::portReturnPressed()
+{
+    if (userLineEdit->text().isEmpty()) userLineEdit->setFocus();
+    else loginButton->animateClick();
 }
 

@@ -290,11 +290,22 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 	ArithmeticExpression *al = left->expand(ei);
 	ArithmeticExpression *ar = right->expand(ei);
 	Division *dp;
+	Addition *ap;
+	Multiplication *mp;
 	NumericalValue *nl = dynamic_cast<NumericalValue*>(al), *nr = dynamic_cast<NumericalValue*>(ar);
 	if (nl && nr) return new NumericalValue(nl->value / nr->value);
 	else if (dp = dynamic_cast<Division*>(al)) return Division(dp->left, new Multiplication(dp->right, ar)).expand(ei);
 	else if (dp = dynamic_cast<Division*>(ar)) return Division(new Multiplication(al, dp->right), dp->left).expand(ei);
-	else {
+	else if (ap = dynamic_cast<Addition*>(al)) {
+		list<ArithmeticExpression*> res;
+		for (list<ArithmeticExpression*>::iterator it = ap->operands.begin(); it != ap->operands.end(); ++it)
+			res.push_back(Division(*it, ar).expand(ei));
+		return new Addition(res);
+	} else if (mp = dynamic_cast<Multiplication*>(al)) {
+		list<ArithmeticExpression*> res(mp->operands);
+		res.front() = Division(res.front(), ar).expand(ei);
+		return new Multiplication(res);
+	} else {
 		return new Division(al, ar);
 		/*list<ArithmeticExpression*> explist;
 		list<ArithmeticExpression*> reslist;
@@ -752,6 +763,9 @@ string CAS::process(string strin) {
 			}
 			casinfo.variables.push_back(Variable(strin.substr(0, pos_assign), aexp));
 			casinfo.commands.push_back(aexp);
+			VariablesModified = true;
+			FunctionsModified = false;
+			CommandsModified = true;
 			return aexp->getString();
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
@@ -780,37 +794,67 @@ string CAS::process(string strin) {
 			}
 			casinfo.functions.push_back(Function(funcname, argvec, aexp));
 			casinfo.commands.push_back(aexp);
+			VariablesModified = false;
+			FunctionsModified = true;
+			CommandsModified = true;
 			return aexp->getString();
 		}
 	} else {
+		VariablesModified = false;
+		FunctionsModified = false;
+		CommandsModified = false;
 		ArithmeticExpression *tmpex = ArithmeticExpression::create(strin);;
 		casinfo.commands.push_back(tmpex);
+		CommandsModified = true;
 		return tmpex->expand(casinfo)->getString();
 	}
 }
 
 void CAS::deleteVariable(string i) {
+	FunctionsModified = false;
+	CommandsModified = false;
 	for (vector<Variable>::iterator it = casinfo.variables.begin(); it != casinfo.variables.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.variables.erase(it);
+			VariablesModified = true;
 			return;
 		}
 	}
+	VariablesModified = false;
 }
 
 void CAS::deleteFunction(string i) {
+	VariablesModified = false;
+	CommandsModified = false;
 	for (vector<Function>::iterator it = casinfo.functions.begin(); it != casinfo.functions.end(); ++it) {
 		if (it->identifier == i) {
 			casinfo.functions.erase(it);
+			FunctionsModified = true;
 			return;
 		}
 	}
+	FunctionsModified = false;
 }
 
 void CAS::clearVariables() {
+	FunctionsModified = false;
+	VariablesModified = true;
+	CommandsModified = false;
 	casinfo.variables.clear();
 }
 
 void CAS::clearFunctions() {
+	FunctionsModified = true;
+	VariablesModified = false;
+	CommandsModified = false;
 	casinfo.functions.clear();
+}
+
+void CAS::reset() {
+	casinfo.functions.clear();
+	casinfo.variables.clear();
+	casinfo.commands.clear();
+	VariablesModified = true;
+	FunctionsModified = true;
+	CommandsModified = true;
 }

@@ -301,16 +301,24 @@ struct ExpansionInformation : CASInformation{
 class CAS {
 private:
 	CASInformation casinfo;
+	bool FunctionsModified;
+	bool VariablesModified;
+	bool CommandsModified;
+
 public:
+	CAS() : FunctionsModified(false), VariablesModified(false), CommandsModified(false) {};
 	string process(string);
 
 	const vector<Variable>& getVariables() const { return casinfo.variables; };
 	const vector<Function>& getFunctions() const { return casinfo.functions; };
 	const vector<Command>& getCommands() const { return casinfo.commands; };
+	bool functionsModified() const { return FunctionsModified; };
+	bool variablesModified() const { return VariablesModified; };
+	bool commandsModified() const { return CommandsModified; };
 
 	void deleteVariable(string);
 	void deleteFunction(string);
 	void clearVariables();
 	void clearFunctions();
-	void reset() { casinfo.commands.clear(); casinfo.functions.clear(); casinfo.variables.clear(); }
+	void reset();
 };

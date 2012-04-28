@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // on the MainWindow that you setup in Designer.
     setupUi(this);
 
-    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(userTextEdited(QString)));
-    connect(portLineEdit, SIGNAL(textEdited(QString)), this, SLOT(portTextEdited(QString)));
+    connect(userLineEdit, SIGNAL(textChanged(QString)), this, SLOT(userTextChanged(QString)));
+    connect(portLineEdit, SIGNAL(textChanged(QString)), this, SLOT(portTextChanged(QString)));
     invalidLabel->setStyleSheet("QLabel { color : red; }");
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(invalidLabel);
     invalidLabel->setGraphicsEffect(effect);
@@ -40,11 +40,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(sayTextEdit, SIGNAL(cHistRequested(QKeyEvent*)), this, SLOT(cHistRequested(QKeyEvent*)));
     connect(serverLineEdit, SIGNAL(returnPressed()), this, SLOT(serverReturnPressed()));
     connect(portLineEdit, SIGNAL(returnPressed()), this, SLOT(portReturnPressed()));
-    connect(portLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
-    connect(serverLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
-    connect(userLineEdit, SIGNAL(textEdited(QString)), this, SLOT(anyTextEdited(QString)));
+    connect(portLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
+    connect(serverLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
+    connect(userLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
     connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
     connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
+
+#ifdef AUTOCONNECT
+    serverLineEdit->setText("localhost");
+    qsrand((uint)QTime::currentTime().msec());
+    userLineEdit->setText("user" + QString::number(qrand()));
+    loginButton->click();
+#endif //AUTOCONNECT
 }
 
 // This gets called when the loginButton gets clicked:
@@ -300,7 +307,7 @@ void MainWindow::deleteScope()
     socket->write(QString("ds:" + scopeListWidget->currentItem()->text() + "\n").toUtf8());
 }
 
-void MainWindow::userTextEdited(const QString& text)
+void MainWindow::userTextChanged(const QString& text)
 {
     if (text.contains(",") || text.contains(":")) {
         invalidLabel->setText("Usernames cannot contain \",\" or \":\".");
@@ -312,7 +319,7 @@ void MainWindow::userTextEdited(const QString& text)
     }
 }
 
-void MainWindow::portTextEdited(const QString &text)
+void MainWindow::portTextChanged(const QString &text)
 {
     bool isNumber = false;
     text.toInt(&isNumber);
@@ -325,7 +332,7 @@ void MainWindow::portTextEdited(const QString &text)
     }
 }
 
-void MainWindow::anyTextEdited(const QString &)
+void MainWindow::anyTextChanged(const QString &)
 {
     if (userLineEdit->text().isEmpty() || portLineEdit->text().isEmpty() || serverLineEdit->text().isEmpty())
         loginButton->setEnabled(false);

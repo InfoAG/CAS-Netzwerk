@@ -1,3 +1,10 @@
+//#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
+
+#ifdef AUTOCONNECT
+#include <qglobal.h>
+#include <time.h>
+#endif //AUTOCONNECT
+
 // We need to include a couple Qt classes that we'll use:
 #include <QMainWindow>
 #include <QTcpSocket>
@@ -52,9 +59,9 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void customScopeContextMenuRequested(const QPoint&);
         void deleteScope();
 
-        void userTextEdited(const QString&);
-        void portTextEdited(const QString&);
-        void anyTextEdited(const QString&);
+        void userTextChanged(const QString&);
+        void portTextChanged(const QString&);
+        void anyTextChanged(const QString&);
         void serverReturnPressed();
         void portReturnPressed();
 

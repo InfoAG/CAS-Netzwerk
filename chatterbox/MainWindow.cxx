@@ -115,8 +115,12 @@ void MainWindow::readyRead()
             stackedWidget->setCurrentWidget(chatPage);
         } else if (line == "inuse") {
             socket->disconnectFromHost();
+#ifdef AUTOCONNECT
+            userLineEdit->setText("user" + QString::number(qrand()));
+            loginButton->click();
+#else
             QMessageBox::information(this, "CAS Client", "The username \"" + userLineEdit->text() + "\" is already in use. Please choose a different one.");
-
+#endif //AUTOCONNECT
         // Is this a user list message:
         }else if(line.left(line.indexOf(':')) == "ul")
         {

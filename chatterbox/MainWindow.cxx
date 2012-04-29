@@ -314,21 +314,26 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             QHelpEvent *helpEvent = static_cast<QHelpEvent*>(event);
             QTextCursor cursor = static_cast<QTextEdit*>(obj)->cursorForPosition(helpEvent->pos());
             cursor.select(QTextCursor::WordUnderCursor); //problem: needs whitespaces around expression; no syntax checking
-            int posEqual;
+            QString selected = cursor.selectedText();
+            cursor.movePosition(QTextCursor::EndOfWord);
+            cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor);
+            QString dbg = cursor.selectedText();
 
-            foreach (QListWidgetItem *widget, functionListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
-                posEqual = widget->text().indexOf("=");
-                if (widget->text().left(posEqual) == cursor.selectedText()) {
-                    QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - posEqual - 1));
-                    return true;
+            if (cursor.selectedText() == "(") {
+                foreach (QListWidgetItem *widget, functionListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
+                    if (widget->text().left(widget->text().indexOf("(")) == selected) {
+                        QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - widget->text().indexOf("=") - 1));
+                        return true;
+                    }
                 }
-            }
-
-            foreach (QListWidgetItem *widget,  variableListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
-                posEqual = widget->text().indexOf("=");
-                if (widget->text().left(posEqual) == cursor.selectedText()) {
-                    QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - posEqual - 1));
-                    return true;
+            } else {
+                int pos;
+                foreach (QListWidgetItem *widget,  variableListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
+                    pos = widget->text().indexOf("=");
+                    if (widget->text().left(pos) == selected) {
+                        QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - pos - 1));
+                        return true;
+                    }
                 }
             }
 

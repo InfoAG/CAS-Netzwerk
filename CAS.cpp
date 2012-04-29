@@ -545,7 +545,7 @@ Multiplication *Multiplication::formMonom() const {
 }
 
 string CommandExpression::getString() const {
-	return "$" + id;
+	return string("$") + dtostr(id);
 }
 
 string Addition::getString() const {

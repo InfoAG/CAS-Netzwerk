@@ -125,7 +125,7 @@ void MainWindow::readyRead()
         }else if(line.left(line.indexOf(':')) == "ul")
         {
             // If so, udpate our users list on the right:
-            QStringList users = line.right(line.length() - 3).split(",");
+            QStringList users = line.right(line.length() - 3).split(";");
             userListWidget->clear();
             QListWidgetItem *lwi = new QListWidgetItem(QPixmap(":/cas.png"), "CAS", userListWidget);
             lwi->setToolTip(socket->peerAddress().toString());
@@ -140,7 +140,7 @@ void MainWindow::readyRead()
         } else if(line.left(line.indexOf(':')) == "sl") //scope list update
         {
             // If so, udpate our scope list on the left:
-            QStringList scopes = line.right(line.length() - 3).split(",");
+            QStringList scopes = line.right(line.length() - 3).split(";");
             scopeListWidget->clear();
             QMap<QString, QListWidgetItem*> listitembyscope;
             foreach(QString scope, scopes) {
@@ -165,7 +165,7 @@ void MainWindow::readyRead()
         } else if(line.left(line.indexOf(':')) == "fl")
         {
                 // If so, udpate our functions list on the right:
-                QStringList items = line.right(line.length() - 3).split(",");
+                QStringList items = line.right(line.length() - 3).split(";");
                 functionListWidget->clear();
 
                 foreach(QString item, items) {
@@ -174,7 +174,7 @@ void MainWindow::readyRead()
         } else if(line.left(line.indexOf(':')) == "vl")
         {
                 // If so, udpate our variables list on the right:
-                QStringList items = line.right(line.length() - 3).split(",");
+                QStringList items = line.right(line.length() - 3).split(";");
                 variableListWidget->clear();
 
                 foreach(QString item, items) {
@@ -183,7 +183,7 @@ void MainWindow::readyRead()
         } else if(line.left(line.indexOf(':')) == "cl")
         {
                 // If so, udpate our commands list on the right:
-                QStringList items = line.right(line.length() - 3).split(",");
+                QStringList items = line.right(line.length() - 3).split(";");
                 commandListWidget->clear();
 
                 foreach(QString item, items) {

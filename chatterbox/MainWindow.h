@@ -1,4 +1,4 @@
-//#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
+#define AUTOCONNECT //attempt to connect to localhost with random username for debug purposes
 
 #ifdef AUTOCONNECT
 #include <qglobal.h>

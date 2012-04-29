@@ -317,7 +317,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             QString selected = cursor.selectedText();
             cursor.movePosition(QTextCursor::EndOfWord);
             cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor);
-            QString dbg = cursor.selectedText();
 
             if (cursor.selectedText() == "(") {
                 foreach (QListWidgetItem *widget, functionListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {

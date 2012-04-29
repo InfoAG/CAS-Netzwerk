@@ -327,12 +327,22 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     }
                 }
             } else {
-                int pos;
-                foreach (QListWidgetItem *widget,  variableListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
-                    pos = widget->text().indexOf("=");
-                    if (widget->text().left(pos) == selected) {
-                        QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - pos - 1));
+                cursor.movePosition(QTextCursor::StartOfWord);
+                cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor);
+                if (cursor.selectedText() == "$") {
+                    int whichCommand = selected.toInt();
+                    if (whichCommand > 0 && whichCommand <= commandListWidget->count()) {
+                        QToolTip::showText(helpEvent->globalPos(), commandListWidget->item(whichCommand - 1)->text());
                         return true;
+                    }
+                } else {
+                    int pos;
+                    foreach (QListWidgetItem *widget,  variableListWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard)) {
+                        pos = widget->text().indexOf("=");
+                        if (widget->text().left(pos) == selected) {
+                            QToolTip::showText(helpEvent->globalPos(), widget->text().right(widget->text().length() - pos - 1));
+                            return true;
+                        }
                     }
                 }
             }

@@ -455,7 +455,7 @@ ArithmeticExpression *Integral::expand(const ExpansionInformation& ei) const {
 
 
 string Integral::getString() const {
-	return "integrate(" + aexp->getString() + "," + var->getString() + "," + dtostr(lower_bound) + "," + dtostr(upper_bound);
+	return "integrate(" + aexp->getString() + "," + var->getString() + "," + dtostr(lower_bound) + "," + dtostr(upper_bound) + ")";
 }
 
 ArithmeticExpression *VariableExpression::expand(const ExpansionInformation& ei) const {

@@ -178,7 +178,7 @@ void ChatterBoxServer::sendUserListToScope(QList<QTcpSocket*> scopeclients)
 
     //send to clients:
     foreach(QTcpSocket *client, scopeclients)
-        client->write(QString("ul:" + userList.join(",") + "\n").toUtf8());
+        client->write(QString("ul:" + userList.join(";") + "\n").toUtf8());
 }
 
 void ChatterBoxServer::sendScopeList(QTcpSocket *socket = NULL) {
@@ -186,10 +186,10 @@ void ChatterBoxServer::sendScopeList(QTcpSocket *socket = NULL) {
     foreach(QString scope, socketsbyscope.keys())
         scopeList << scope;
 
-    if (socket) socket->write(QString("sl:" + scopeList.join(",") + "\n").toUtf8());
+    if (socket) socket->write(QString("sl:" + scopeList.join(";") + "\n").toUtf8());
     else {
         foreach(QTcpSocket *client, clients)
-            client->write(QString("sl:" + scopeList.join(",") + "\n").toUtf8());
+            client->write(QString("sl:" + scopeList.join(";") + "\n").toUtf8());
     }
 }
 
@@ -197,21 +197,21 @@ void ChatterBoxServer::sendFunctions(QTcpSocket *socket) {
     QStringList functionList;
     foreach (Function function, casbyscope[scopebysocket[socket]]->getFunctions())
         functionList << QString::fromStdString(function.getString());
-    socket->write(QString("fl:" + functionList.join(",") + "\n").toUtf8());
+    socket->write(QString("fl:" + functionList.join(";") + "\n").toUtf8());
 }
 
 void ChatterBoxServer::sendVariables(QTcpSocket *socket) {
     QStringList variableList;
     foreach (Variable variable, casbyscope[scopebysocket[socket]]->getVariables())
         variableList << QString::fromStdString(variable.getString());
-    socket->write(QString("vl:" + variableList.join(",")).toUtf8() + "\n");
+    socket->write(QString("vl:" + variableList.join(";")).toUtf8() + "\n");
 }
 
 void ChatterBoxServer::sendCommands(QTcpSocket *socket) {
     QStringList commandList;
     foreach (Command command, casbyscope[scopebysocket[socket]]->getCommands())
         commandList << QString::fromStdString(command.getString());
-    socket->write(QString("cl:" + commandList.join(",")).toUtf8() + "\n");
+    socket->write(QString("cl:" + commandList.join(";")).toUtf8() + "\n");
 }
 
 void ChatterBoxServer::addUserToScope(QTcpSocket* socket, QString scope) {

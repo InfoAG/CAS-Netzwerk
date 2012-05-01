@@ -729,6 +729,16 @@ string Function::getString() const {
 	return out + ")=" + aexp->getString();
 }
 
+Matrix::Matrix(ArithmeticExpression ***c, int x, int y) {
+	for (int i = 0; i < x; x++) {
+		components[i] = new ArithmeticExpression*[y];
+		for (int j = 0; j < y; j++) {
+			components[i][j] = c[i][j];
+		}
+	}
+	
+}
+
 string Command::getString() const {
 	return aexp->getString();
 }

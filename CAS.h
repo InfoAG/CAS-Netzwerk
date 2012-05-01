@@ -247,6 +247,17 @@ struct Vector : public ArithmeticExpression {
 	virtual bool isEqual(ArithmeticExpression *) const;
 };
 
+struct Matrix : public ArithmeticExpression {
+	ArithmeticExpression ***components;
+	int size_x, size_y;
+
+	Matrix(ArithmeticExpression ***, int, int);
+	virtual ArithmeticExpression *copy() const;
+	virtual ArithmeticExpression *expand();
+	virtual string getString() const;
+	virtual bool isEqual(ArithmeticExpression*) const;
+};
+
 struct Variable {
 	string identifier;
 	ArithmeticExpression *aexp;

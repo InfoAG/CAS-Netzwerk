@@ -161,9 +161,7 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			}
 			return new Matrix(c, size_x, tokens.size());
 		} else if (strin.substr(0, 6) == "solve(") {
-			Matrix *mp = dynamic_cast<Matrix*>(ArithmeticExpression::create(strin.substr(6, strin.length() - 7)));
-			if (mp) return new Solver(mp);
-			else throw "Ungueltiger (Teil-)Term";
+			return new Solver(ArithmeticExpression::create(strin.substr(6, strin.length() - 7)));
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
@@ -794,31 +792,34 @@ bool Matrix::isEqual(ArithmeticExpression *other) const {
 }
 
 ArithmeticExpression *Solver::expand(const ExpansionInformation &ei) const {
+	Matrix *mp = dynamic_cast<Matrix*>(matrix->expand(ei));
+	if (! mp) throw "Ungueltiges Argument: solve() mag Matrizen";
+	else if (mp->size_x < 2) throw "Zu wenig Zeilenwerte fuer LGS";
+	//TODO: linear abhängige zeilen abfangen, zu viele zeilen für unbekannte usw.
 	ArithmeticExpression *diff;
-	Matrix *trimatrix = static_cast<Matrix*>(matrix);
-	for (int i = 0; i < trimatrix->size_y; i++) {
-		for (int j = i + 1; j < trimatrix->size_y; j++) {
-			diff = new Division(trimatrix->components[j][i], trimatrix->components[i][i]);
-			for (int k = 0; k < trimatrix->size_x; k++) {
-				trimatrix->components[j][k] = new Subtraction(trimatrix->components[j][k], new Multiplication(diff, trimatrix->components[i][k]));
+	for (int i = 0; i < mp->size_y; i++) {
+		for (int j = i + 1; j < mp->size_y; j++) {
+			diff = new Division(mp->components[j][i], mp->components[i][i]);
+			for (int k = 0; k < mp->size_x; k++) {
+				mp->components[j][k] = new Subtraction(mp->components[j][k], new Multiplication(diff, mp->components[i][k]));
 			}
 		}
 	}
 
-	ArithmeticExpression ***resmatrix = new ArithmeticExpression**[trimatrix->size_x];
+	ArithmeticExpression ***resmatrix = new ArithmeticExpression**[mp->size_x];
 	ArithmeticExpression **ptrptr;
-	for (int i = trimatrix->size_y - 1; i >= 0; i--) {
-		resmatrix[i] = &(trimatrix->components[i][trimatrix->size_x - 1]);
-		for (int j = i + 1; j < trimatrix->size_y; j++) {
+	for (int i = mp->size_y - 1; i >= 0; i--) {
+		resmatrix[i] = &(mp->components[i][mp->size_x - 1]);
+		for (int j = i + 1; j < mp->size_y; j++) {
 			ptrptr = new ArithmeticExpression*;
-			*ptrptr = new Subtraction(*(resmatrix[i]), new Multiplication(*(resmatrix[j]), trimatrix->components[i][j]));
+			*ptrptr = new Subtraction(*(resmatrix[i]), new Multiplication(*(resmatrix[j]), mp->components[i][j]));
 			resmatrix[i] = ptrptr;
 		}
 		ptrptr = new ArithmeticExpression*;
-		*ptrptr = new Division(*(resmatrix[i]), trimatrix->components[i][i]);
+		*ptrptr = new Division(*(resmatrix[i]), mp->components[i][i]);
 		resmatrix[i] = ptrptr;
 	}
-	return Matrix(resmatrix, 1, trimatrix->size_y).expand(ei);
+	return Matrix(resmatrix, 1, mp->size_y).expand(ei);
 }
 
 bool Solver::isEqual(ArithmeticExpression *other) const {

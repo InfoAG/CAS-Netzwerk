@@ -259,9 +259,9 @@ struct Matrix : public ArithmeticExpression {
 };
 
 struct Solver : public ArithmeticExpression {
-	Matrix *matrix;
+	ArithmeticExpression *matrix;
 
-	Solver(Matrix *m) : matrix(m) {};
+	Solver(ArithmeticExpression *m) : matrix(m) {};
 	virtual ArithmeticExpression *copy() const { return new Solver(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
 	virtual string getString() const { return "solve(" + matrix->getString() + ")"; };

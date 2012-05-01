@@ -89,8 +89,8 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 		int pos_multi = 0, pos_divi = 0, pos_potenz = 0;
 
 		for (string::reverse_iterator i = strin.rbegin(); i != strin.rend(); ++i) {
-			if (*i == '(')  ebenencount--;
-			else if (*i == ')') ebenencount++;
+			if (*i == '(' || *i == '[')  ebenencount--;
+			else if (*i == ')' || *i == ']') ebenencount++;
 			else if (ebenencount == 0) {
 				switch (*i) {
 				case '+':

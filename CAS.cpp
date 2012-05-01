@@ -142,11 +142,28 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 		} else if (strin.at(0) == '$' && DecimalRec::runWith(strin.substr(1, strin.length() - 1))) { //!!!!!!ALEX GUCK HIER
 			return new CommandExpression(atoi(strin.substr(1, strin.length() - 1).c_str()));		//!!!!!!!!! decimal, atoi
 		} else if (strin.at(0) == '[' && strin.at(strin.length() - 1) == ']') {
-			ArithmeticExpression *c[3];
 			vector<string> tokens;
 			Tokenize(strin.substr(1, strin.length() -2), tokens, "|");
-			for (int i = 0; i < 3; i++) c[i] = ArithmeticExpression::create(tokens.at(i));
-			return new Vector(c);
+			ArithmeticExpression ***c = new ArithmeticExpression **[tokens.size()];
+			vector<string> line_tokens;
+			int size_x = 0;
+			for (int i = 0; i < tokens.size(); i++) {
+				Tokenize(tokens.at(i), line_tokens, ",");
+
+				if (i == 0) size_x = line_tokens.size();
+				else if (line_tokens.size() != size_x) throw "Ungueltiger (Teil-)Term";
+
+				c[i] = new ArithmeticExpression *[size_x];
+				for (int j = 0; j < size_x; j++) {
+					c[i][j] = ArithmeticExpression::create(line_tokens.at(j));
+				}
+				line_tokens.clear();
+			}
+			return new Matrix(c, size_x, tokens.size());
+		} else if (strin.substr(0, 6) == "solve(") {
+			Matrix *mp = dynamic_cast<Matrix*>(ArithmeticExpression::create(strin.substr(1, strin.length() - 2)));
+			if (mp) return new Solver(mp);
+			else throw "Ungueltiger (Teil-)Term";
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
@@ -683,7 +700,7 @@ bool Vector::isEqual(ArithmeticExpression *other) const {
 
 bool CommandExpression::isEqual(ArithmeticExpression *other) const {
 	CommandExpression *cp = dynamic_cast<CommandExpression*>(other);
-	return (cp->id == id);
+	return (cp && cp->id == id);
 }
 
 
@@ -726,17 +743,52 @@ string Function::getString() const {
 		if (it != func_args.begin()) out += ",";
 		out += (*it);
 	}
-	return out + ")=" + aexp->getString();
+	return out	+ ")" // linebreak to prevent unhappy smiley =)
+				+ "=" + aexp->getString();
 }
 
 Matrix::Matrix(ArithmeticExpression ***c, int x, int y) {
-	for (int i = 0; i < x; x++) {
+	components = new ArithmeticExpression **[x];
+	for (int i = 0; i < x; i++) {
 		components[i] = new ArithmeticExpression*[y];
 		for (int j = 0; j < y; j++) {
 			components[i][j] = c[i][j];
 		}
 	}
-	
+	size_x = x;
+	size_y = y;
+}
+
+string Matrix::getString() const {
+	string result = "[";
+	for (int i = 0; i < size_x; i++) {
+		for (int j = 0; j < size_y; j++) {
+			result += components[i][j]->getString();
+			if (j < size_y - 1) result += ",";
+		}
+		if (i < size_x - 1) result += "|";
+	}
+	return result + "]";
+}
+
+bool Matrix::isEqual(ArithmeticExpression *other) const {
+	Matrix *mp = dynamic_cast<Matrix*>(other);
+	if (! mp || size_x != mp->size_x || size_y != mp->size_y) return false;
+	for (int i = 0; i < size_x; i++) {
+		for (int j = 0; j < size_y; j++) {
+			if (components[i][j] != mp->components[i][j]) return false;
+		}
+	}
+	return true;
+}
+
+ArithmeticExpression *Solver::expand(const ExpansionInformation &ei) const {
+
+}
+
+bool Solver::isEqual(ArithmeticExpression *other) const {
+	Solver *sp = dynamic_cast<Solver*>(other);
+	return sp && sp->matrix->isEqual(matrix);
 }
 
 string Command::getString() const {

@@ -252,10 +252,20 @@ struct Matrix : public ArithmeticExpression {
 	int size_x, size_y;
 
 	Matrix(ArithmeticExpression ***, int, int);
-	virtual ArithmeticExpression *copy() const;
-	virtual ArithmeticExpression *expand();
+	virtual ArithmeticExpression *copy() const { return new Matrix(*this); };
+	virtual ArithmeticExpression *expand(const ExpansionInformation&) const { return copy(); };
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression*) const;
+};
+
+struct Solver : public ArithmeticExpression {
+	Matrix *matrix;
+
+	Solver(Matrix *m) : matrix(m) {};
+	virtual ArithmeticExpression *copy() const { return new Solver(*this); };
+	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
+	virtual string getString() const { return "solve(" + matrix->getString() + ")"; };
+	virtual bool isEqual(ArithmeticExpression *other) const;
 };
 
 struct Variable {

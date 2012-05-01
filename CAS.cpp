@@ -161,7 +161,7 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			}
 			return new Matrix(c, size_x, tokens.size());
 		} else if (strin.substr(0, 6) == "solve(") {
-			Matrix *mp = dynamic_cast<Matrix*>(ArithmeticExpression::create(strin.substr(1, strin.length() - 2)));
+			Matrix *mp = dynamic_cast<Matrix*>(ArithmeticExpression::create(strin.substr(6, strin.length() - 7)));
 			if (mp) return new Solver(mp);
 			else throw "Ungueltiger (Teil-)Term";
 		} else {
@@ -737,6 +737,17 @@ string Variable::getString() const {
 	return identifier + "=" + aexp->getString();
 }
 
+ArithmeticExpression *Matrix::expand(const ExpansionInformation &ei) const {
+	ArithmeticExpression ***res = new ArithmeticExpression **[size_y];
+	for (int i = 0; i < size_y; i++) {
+		res[i] = new ArithmeticExpression*[size_x];
+		for (int j = 0; j < size_x; j++) {
+			res[i][j] = components[i][j]->expand(ei);
+		}
+	}
+	return new Matrix(res, size_x, size_y);
+}
+
 string Function::getString() const {
 	string out = identifier + "(";
 	for (vector<string>::const_iterator it = func_args.begin(); it != func_args.end(); ++it) {
@@ -749,9 +760,9 @@ string Function::getString() const {
 
 Matrix::Matrix(ArithmeticExpression ***c, int x, int y) {
 	components = new ArithmeticExpression **[x];
-	for (int i = 0; i < x; i++) {
+	for (int i = 0; i < y; i++) {
 		components[i] = new ArithmeticExpression*[y];
-		for (int j = 0; j < y; j++) {
+		for (int j = 0; j < x; j++) {
 			components[i][j] = c[i][j];
 		}
 	}
@@ -761,12 +772,12 @@ Matrix::Matrix(ArithmeticExpression ***c, int x, int y) {
 
 string Matrix::getString() const {
 	string result = "[";
-	for (int i = 0; i < size_x; i++) {
-		for (int j = 0; j < size_y; j++) {
+	for (int i = 0; i < size_y; i++) {
+		for (int j = 0; j < size_x; j++) {
 			result += components[i][j]->getString();
-			if (j < size_y - 1) result += ",";
+			if (j < size_x - 1) result += ",";
 		}
-		if (i < size_x - 1) result += "|";
+		if (i < size_y - 1) result += "|";
 	}
 	return result + "]";
 }
@@ -783,7 +794,31 @@ bool Matrix::isEqual(ArithmeticExpression *other) const {
 }
 
 ArithmeticExpression *Solver::expand(const ExpansionInformation &ei) const {
+	ArithmeticExpression *diff;
+	Matrix *trimatrix = static_cast<Matrix*>(matrix);
+	for (int i = 0; i < trimatrix->size_y; i++) {
+		for (int j = i + 1; j < trimatrix->size_y; j++) {
+			diff = new Division(trimatrix->components[j][i], trimatrix->components[i][i]);
+			for (int k = 0; k < trimatrix->size_x; k++) {
+				trimatrix->components[j][k] = new Subtraction(trimatrix->components[j][k], new Multiplication(diff, trimatrix->components[i][k]));
+			}
+		}
+	}
 
+	ArithmeticExpression ***resmatrix = new ArithmeticExpression**[trimatrix->size_x];
+	ArithmeticExpression **ptrptr;
+	for (int i = trimatrix->size_y - 1; i >= 0; i--) {
+		resmatrix[i] = &(trimatrix->components[i][trimatrix->size_x - 1]);
+		for (int j = i + 1; j < trimatrix->size_y; j++) {
+			ptrptr = new ArithmeticExpression*;
+			*ptrptr = new Subtraction(*(resmatrix[i]), new Multiplication(*(resmatrix[j]), trimatrix->components[i][j]));
+			resmatrix[i] = ptrptr;
+		}
+		ptrptr = new ArithmeticExpression*;
+		*ptrptr = new Division(*(resmatrix[i]), trimatrix->components[i][i]);
+		resmatrix[i] = ptrptr;
+	}
+	return Matrix(resmatrix, 1, trimatrix->size_y).expand(ei);
 }
 
 bool Solver::isEqual(ArithmeticExpression *other) const {

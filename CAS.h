@@ -253,7 +253,7 @@ struct Matrix : public ArithmeticExpression {
 
 	Matrix(ArithmeticExpression ***, int, int);
 	virtual ArithmeticExpression *copy() const { return new Matrix(*this); };
-	virtual ArithmeticExpression *expand(const ExpansionInformation&) const { return copy(); };
+	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
 	virtual string getString() const;
 	virtual bool isEqual(ArithmeticExpression*) const;
 };

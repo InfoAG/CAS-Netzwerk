@@ -406,6 +406,7 @@ ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) con
 		if (nr->value == 0) return new NumericalValue(1);
 		else if (nr->value == 1) return al;
 	}
+	if (nl && nl->value == 1) return al;
 	return new Exponentiation(al, ar);
 }
 

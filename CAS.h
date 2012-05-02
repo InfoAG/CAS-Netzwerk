@@ -2,10 +2,10 @@
 #include "lexer.h"
 #include <vector>
 #include <iostream>
-#include <sstream>
 #include <cmath>
 #include <list>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 

@@ -5,6 +5,7 @@ string dtostr(double d) {
 	ss << d;
 	return ss.str();
 }
+
 bool compareOperands(const list<ArithmeticExpression*>& first, const list<ArithmeticExpression*>& second) {
 	bool deleted;
 	if (second.size() == first.size()) {
@@ -623,36 +624,36 @@ string Subtraction::getString() const {
 }
 
 string Multiplication::getString() const {
-	stringstream ss;
+	string result;
 	Addition *ap;
 	for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
-		if (ap = dynamic_cast<Addition*>(*it)) ss << "(" << (*it)->getString() << ")";
-		else ss << (*it)->getString();
-		if (it != --(operands.end())) ss << "*";
+		if (ap = dynamic_cast<Addition*>(*it)) result += "(" + (*it)->getString() + ")";
+		else result += (*it)->getString();
+		if (it != --(operands.end())) result += "*";
 	}
-	return ss.str();
+	return result;
 }
 
 string Division::getString() const {
-	stringstream ss;
+	string result;
 	LevelingOperation *lp = dynamic_cast<LevelingOperation*>(left), *rp = dynamic_cast<LevelingOperation*>(right);
-	if (lp) ss << "(" << left->getString() << ")";
-	else ss << left->getString();
-	ss << "/";
-	if (rp) ss << "(" << right->getString() << ")";
-	else ss << right->getString();
-	return ss.str();
+	if (lp) result += "(" + left->getString() + ")";
+	else result += left->getString();
+	result += "/";
+	if (rp) result += "(" + right->getString() + ")";
+	else result += right->getString();
+	return result;
 }
 
 string Exponentiation::getString() const {
-	stringstream ss;
+	string result;
 	LevelingOperation *lp = dynamic_cast<LevelingOperation*>(left), *rp = dynamic_cast<LevelingOperation*>(right);
-	if (lp) ss << "(" << left->getString() << ")";
-	else ss << left->getString();
-	ss << "^";
-	if (rp) ss << "(" << right->getString() << ")";
-	else ss << right->getString();
-	return ss.str();
+	if (lp) result += "(" + left->getString() + ")";
+	else result += left->getString();
+	result += "^";
+	if (rp) result += "(" + right->getString() + ")";
+	else result += right->getString();
+	return result;
 }
 
 string SquareRoot::getString() const {
@@ -803,9 +804,9 @@ string Function::getString() const {
 }
 
 Matrix::Matrix(ArithmeticExpression ***c, int x, int y) {
-	components = new ArithmeticExpression **[x];
+	components = new ArithmeticExpression **[y];
 	for (int i = 0; i < y; i++) {
-		components[i] = new ArithmeticExpression*[y];
+		components[i] = new ArithmeticExpression*[x];
 		for (int j = 0; j < x; j++) {
 			components[i][j] = c[i][j];
 		}

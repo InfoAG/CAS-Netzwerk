@@ -1,243 +1,174 @@
 #include "matrix.h"
 
 matrix::matrix(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent, Qt::FramelessWindowHint)
 {
-    this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    this->currentSize = 1;
+    QPushButton* accepted_button = new QPushButton;
+    accepted_button->setText(tr("Ok"));
+    accepted_button->setDefault(true);
+    QPushButton* quit_button = new QPushButton;
+    quit_button->setText(tr("Quit"));
+    QHBoxLayout* button_layout = new QHBoxLayout;
+    button_layout->addWidget(accepted_button);
+    button_layout->addWidget(quit_button);
 
-    //input-parameter
-    QSpinBox* spin1 = new QSpinBox;
-    spin1->setMinimum(1);
-    spin1->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    spin1->setKeyboardTracking(false);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    tblv = new QTableView();
+    installEventFilter(this);
 
-    QLabel* label1 = new QLabel;
-    label1->setText("Gleichungen mit");
-    label1->setAlignment(Qt::AlignCenter);
+    mainLayout->addWidget(tblv);
+    mainLayout->addLayout(button_layout);
+    setLayout(mainLayout);
 
-    QSpinBox* spin2 = new QSpinBox;
-    spin2->setMinimum(1);
-    spin2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    model = new QStandardItemModel(2, 2, this);
+    //model->setHorizontalHeaderItem(0, new QStandardItem(QString("1")));
+    //model->setHorizontalHeaderItem(1,new QStandardItem(QString("2")));
+    QStandardItem* item = new QStandardItem(QString("[Arrow Right]"));
+    item->setSelectable(false);
+    model->setItem(0, 0,new QStandardItem());
+    model->setItem(0, 1, item);
+    model->setItem(1, 0, new QStandardItem(QString("[Arrow Down]")));
 
-    QLabel* label2 = new QLabel;
-    label2->setText("Unbekannten");
-    label2->setAlignment(Qt::AlignCenter);
+    tblv->setModel(model);
 
-    QHBoxLayout *input_param = new QHBoxLayout;
-    input_param->addWidget(spin1);
-    input_param->addWidget(label1);
-    input_param->addWidget(spin2);
-    input_param->addWidget(label2);
+    //setAttribute( Qt::WA_TranslucentBackground, true);
+    connect(quit_button,SIGNAL(clicked()),this,SLOT(reject()));
 
+    //setStyleSheet("matrix {background-color: black; border-radius: 5px; border-color: black; border-width: 2px; border-style: outset; padding-top: 2px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px}");
 
-    //initial Equation
-    QDoubleSpinBox* initial_value = new QDoubleSpinBox;
-    initial_value->setSingleStep(0.1);
-    initial_value->setLocale(QLocale::C);
-    QLabel* initial_letter = new QLabel;
-    QLabel* eq_sign = new QLabel;
-    initial_letter->setText("a");
-    initial_letter->setAlignment(Qt::AlignLeft);
-    eq_sign->setText("=");
-    eq_sign->setAlignment(Qt::AlignCenter);
-    QDoubleSpinBox* initial_result = new QDoubleSpinBox;
-    initial_result->setSingleStep(0.1);
-    initial_result->setLocale(QLocale::C);
-    eq_coef_layout = new QGridLayout;
-    eq_sign_layout = new QVBoxLayout;
-    res_layout = new QVBoxLayout;
-    eq_coef_layout->addWidget(initial_value,0,0);
-    eq_coef_layout->addWidget(initial_letter,0,1);
-    eq_sign_layout->addWidget(eq_sign);
-    res_layout->addWidget(initial_result);
-    eq_layout = new QHBoxLayout;
-    eq_layout->addLayout(eq_coef_layout);
-    eq_layout->addLayout(eq_sign_layout);
-    eq_layout->addLayout(res_layout);
+    //setStyleSheet("matrix {border-width: 5px; border-style: inset; border-color: grey; border-radius: 9px; background: black; color: blue; selection-background-color: ltblue;}");
 
-    //control Buttons
-    QPushButton *quitButton = new QPushButton("Abbrechen");
-    QPushButton *Ok = new QPushButton("Ok");
-    Ok->setDefault(true);
-    QHBoxLayout *button_layout = new QHBoxLayout;
-    button_layout->addWidget(Ok);
-    button_layout->addWidget(quitButton);
+    //setStyleSheet("matrix {background-color: black; border-style: outset; border-width: 10px; border-radius: 20px; border-color: white; font: bold 14px; min-width: 10em; padding: 6px}");
 
 
-    //Master-Layout
-    QVBoxLayout *all_layout = new QVBoxLayout;
-    all_layout->addLayout(input_param);
-    all_layout->addLayout(eq_layout);
-    all_layout->addLayout(button_layout);
-    setLayout(all_layout);
-    setWindowTitle("Matrix");
+    //this->setMask(roundedRect(tblv->rect(), 10));
 
-    /*setTabOrder(spin1,spin2);
-    setTabOrder(spin2,initial_value);
-    setTabOrder(initial_value,initial_result);
-    setTabOrder(initial_result,Ok);
-    setTabOrder(Ok,quitButton);*/
 
-    connect(spin1,SIGNAL(valueChanged(int)),spin2, SLOT(setValue(int)));
-    connect(spin1,SIGNAL(valueChanged(int)),this, SLOT(changeContent(int)));
-    connect(spin2,SIGNAL(valueChanged(int)),spin1,SLOT(setValue(int)));
-    connect(quitButton,SIGNAL(clicked()),this,SLOT(reject()));
-    connect(Ok,SIGNAL(clicked()),this,SLOT(accept()));
+    QPixmap pixmap(this->sizeHint());
+    QPainter painter(&pixmap);
+    painter.fillRect(pixmap.rect(), Qt::white);
+    painter.setBrush(Qt::black);
+    painter.drawRoundRect(pixmap.rect());
+    setMask(pixmap.createMaskFromColor(Qt::white));
+}
+
+QSize matrix::sizeHint() const
+{
+    return QSize(300, 200);
+}
+
+void matrix::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        move(event->globalPos() - m_dragPosition);
+        event->accept();
+    }
+}
+
+void matrix::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+        event->accept();
+    }
+}
+
+void matrix::paintEvent(QPaintEvent*)
+{
+
+    const QPoint start(width()/2, 0);
+    const QPoint finalStop(width()/2, height());
+    QLinearGradient gradient(start, finalStop);
+    const QColor qtGreen(102, 176, 54);
+    gradient.setColorAt(0, qtGreen.dark());
+    gradient.setColorAt(0.5, qtGreen);
+    gradient.setColorAt(1, qtGreen.dark());
+
+    QPainter p(this);
+    p.fillRect(0, 0, width(), height(), gradient);
+
+    QFont headerFont("Sans Serif", 12, QFont::Bold);
+    QFont normalFont("Sans Serif", 9, QFont::Normal);
+
+    // draw it twice for shadow effect
+    p.setFont(headerFont);
+    QRect headerRect(1, 1, width(), 25);
+    p.setPen(Qt::black);
+    //p.drawText(headerRect, Qt::AlignCenter, m_station.name());
+
+    headerRect.moveTopLeft(QPoint(0, 0));
+    p.setPen(Qt::white);
+    //p.drawText(headerRect, Qt::AlignCenter, m_station.name());
+
+    p.setFont(normalFont);
+}
+
+void matrix::resizeEvent(QResizeEvent*)
+{
+    QBitmap maskBitmap(width(), height());
+    maskBitmap.clear();
+
+    QPainter p(&maskBitmap);
+    p.setBrush(Qt::black);
+    p.drawRoundRect(0, 0, width(), height(), 20, 30);
+    p.end();
+
+    setMask(maskBitmap);
 }
 
 
 
-void matrix::changeContent(int val)
+
+void matrix::keyPressEvent(QKeyEvent *e)
 {
-    if(val > currentSize)
+    if(e->key() == Qt::Key_Right)
     {
-        //new line
-        QDoubleSpinBox* newInput = new QDoubleSpinBox;
-        newInput->setSingleStep(0.1);
-        newInput->setLocale(QLocale::C);
-        this->eq_coef_layout->addWidget(newInput,val-1,0);
-        QLabel* newA = new QLabel;
-        newA->setText("a");
-        newA->setAlignment(Qt::AlignCenter);
-        this->eq_coef_layout->addWidget(newA,val-1,1);
-
-        int pos;
-        for(int i = 2; i < val; i++) //i = column
-        {
-            pos = 3 * i - 4;
-
-
-            QDoubleSpinBox* newSpin = new QDoubleSpinBox;
-            newSpin->setSingleStep(0.1);
-            newSpin->setLocale(QLocale::C);
-
-            QLabel* newMathSign = new QLabel;
-            newMathSign->setText("+");
-            newMathSign->setAlignment(Qt::AlignCenter);
-
-            this->eq_coef_layout->addWidget(newMathSign,val-1,pos);
-            this->eq_coef_layout->addWidget(newSpin,val-1,pos+1);
-            this->eq_coef_layout->addWidget(new QLabel((QString)(96+i)),val-1,pos+2);
-        }
-
-
-        //new stuff next to the new coeff
-        QLabel* newLineEq = new QLabel; //new eqSign for new Equation
-        newLineEq->setText("=");
-        newLineEq->setAlignment(Qt::AlignCenter);
-        this->eq_sign_layout->addWidget(newLineEq);
-        QDoubleSpinBox* newRes = new QDoubleSpinBox;
-        newRes->setSingleStep(0.1);
-        newRes->setLocale(QLocale::C);
-        this->res_layout->addWidget(newRes);
-
-
-        int eq_pos = 3 * val - 4;
-
-        for(int i = 0; i < val; i++) //i = row
-        {
-            QDoubleSpinBox* newSpin = new QDoubleSpinBox;
-            newSpin->setSingleStep(0.1);
-            newSpin->setLocale(QLocale::C);
-
-            QLabel* newMathSign = new QLabel;
-            newMathSign->setText("+");
-            newMathSign->setAlignment(Qt::AlignCenter);
-
-            QLabel* newLetter = new QLabel;
-            QString temp = "";
-            temp.append((char)97+(val-1));
-            newLetter->setText(temp);
-            temp.clear();
-
-            this->eq_coef_layout->addWidget(newMathSign,i,eq_pos);
-            this->eq_coef_layout->addWidget(newSpin,i,eq_pos+1);
-            this->eq_coef_layout->addWidget(newLetter,i,eq_pos+2);
-        }
-
-
-        //new setTabOrder defs: LARS GUCK HIER
-        /*QString current_className;
-        QWidget* current_widget;
-        for(int i = 0; i < val; i++)
-        {
-            for(int j = 0,len = 0; j < val; j++)
-            {
-                current_widget = eq_coef_layout->itemAtPosition(i,len)->widget();
-                current_className = current_widget->metaObject()->className();
-                if(current_className == "QDoubleSpinBox")
-                {
-                    setTabOrder(first,current_widget);
-                    first = current_widget;
-                    len+=3;
-                }
-            }
-            current_widget = res_layout->itemAt(i)->widget();
-            setTabOrder(first,current_widget);
-            first = current_widget;
-        }*/
-
-
-
-
-
+        qDebug() << "derp";
 
     }
 
-
-    else //if increase == false
-    {
-        //delete last line
-        int length = (val+1)*2+(val)+2;
-        QWidget *tmp_widget;
-        for(int i = 0; i < length; i++)
-        {
-            if(i < length-2)
-            {
-                tmp_widget = eq_coef_layout->itemAtPosition(val,i)->widget();
-                eq_coef_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-            }
-            else if(i == length-2)
-            {
-                tmp_widget = eq_sign_layout->itemAt(val)->widget();
-                eq_sign_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-            }
-            else
-            {
-                tmp_widget = res_layout->itemAt(val)->widget();
-                res_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-            }
-
-        }
-
-        //delete last elements of equation
-        int eq_pos = ((val+1)*2+(val))-1;
-        for(int i = 0; i < val; i++) //i = row; last row has been deleted
-        {
-            //if((eq_coef_layout->itemAtPosition(i,eq_pos-2) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos-1) != 0) && (eq_coef_layout->itemAtPosition(i,eq_pos) != 0))
-            //{
-                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos-2)->widget();
-                eq_coef_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos-1)->widget();
-                eq_coef_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-                tmp_widget = eq_coef_layout->itemAtPosition(i,eq_pos)->widget();
-                eq_coef_layout->removeWidget(tmp_widget);
-                delete tmp_widget;
-            //}
-        }
-
-        this->adjustSize();
-    }
-    this->currentSize = val;
 }
 
-QString matrix::getMatrixString() const {
+
+/*bool matrix::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type()==QEvent::KeyPress)
+    {
+        QKeyEvent* pKeyEvent=static_cast<QKeyEvent*>(event);
+        if(pKeyEvent->key() == Qt::Key_Right)
+        {
+            if (tblv->hasFocus())
+            {
+                qDebug() << "Event filter: RightArrow";
+            }
+            return TRUE;
+        }
+        else if(pKeyEvent->key() == Qt::Key_Down)
+        {
+            if (tblv->hasFocus())
+            {
+                qDebug() << "Event filter: DownArrow";
+            }
+            return TRUE;
+        }
+    }
+
+    return QWidget::eventFilter(object, event);
+}*/
+
+
+
+void matrix::expandModel()
+{
+//insertcolumns()
+//
+
+}
+
+
+
+
+/*QString matrix::getMatrixString() const {
     QString matrixstr;
     for (int i = 0; i < this->currentSize; i++) {
         for (int j = 0; j < this->currentSize; j++) {
@@ -247,12 +178,12 @@ QString matrix::getMatrixString() const {
         if (i < this->currentSize - 1) matrixstr += "|";
     }
     return matrixstr;
-}
+}*/
 
 QString matrix::MatrixDlg() {
     matrix MDlg;
     if (MDlg.exec() == QDialog::Accepted) {
-        return MDlg.getMatrixString();
+        return "herp"; //MDlg.getMatrixString();
     }
     else return QString();
 }

@@ -28,7 +28,7 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
         button->animateClick();
     } else if ((e->key() == Qt::Key_Up) || (e->key() == Qt::Key_Down)) {
         emit cHistRequested(e);
-    } else if (e->key() == Qt::Key_BracketLeft) {
+    } else if (e->text() == "[") {
         QTextEdit::keyPressEvent(e);
         QString matrixstr = matrix::MatrixDlg();
         if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();

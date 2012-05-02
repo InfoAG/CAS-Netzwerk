@@ -10,23 +10,32 @@ class matrix : public QDialog
     Q_OBJECT
 public:
     matrix(QWidget *parent = 0);
-    QString getMatrixString() const;
-
+    //QString getMatrixString() const;
     static QString MatrixDlg();
 
-private:
-    QHBoxLayout* input_param; //params
-    QGridLayout* eq_coef_layout; //coeffs of equations
-    QVBoxLayout* eq_sign_layout; //eq sign layout
-    QVBoxLayout* res_layout; //equation result layout
-    QHBoxLayout* eq_layout; //Equation Layout
+    //bool eventFilter(QObject* object, QEvent* event);
+    QSize sizeHint() const;
 
-    int currentSize; //holds the current value of the spin1/spin2
+
+protected:
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void keyPressEvent(QKeyEvent *e);
+
+private:
+    QTableView *tblv;
+    QStandardItemModel *model;
+
+    QPoint m_dragPosition;
+    QStringList m_lines;
+
     
 signals:
     
 public slots:
-    void changeContent(int val);
+    void expandModel();
     //void calc();
     
 };

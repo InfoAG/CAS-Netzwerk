@@ -9,6 +9,8 @@
 
 using namespace std;
 
+string dtostr(double);
+
 struct ArithmeticExpression;
 struct UnaryOperation;
 struct BinaryOperation;
@@ -265,6 +267,16 @@ struct Solver : public ArithmeticExpression {
 	virtual ArithmeticExpression *copy() const { return new Solver(*this); };
 	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
 	virtual string getString() const { return "solve(" + matrix->getString() + ")"; };
+	virtual bool isEqual(ArithmeticExpression *other) const;
+};
+
+struct Selection : public ArithmeticExpression {
+	ArithmeticExpression *expression, *select_x, *select_y;
+
+	Selection(ArithmeticExpression *e, ArithmeticExpression *x, ArithmeticExpression *y) : expression(e), select_x(x), select_y(y) {};
+	virtual ArithmeticExpression *copy() const { return new Selection(*this); };
+	virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
+	virtual string getString() const { return expression->getString() + "{" + select_x->getString() + "," + select_y->getString() + "}"; };
 	virtual bool isEqual(ArithmeticExpression *other) const;
 };
 

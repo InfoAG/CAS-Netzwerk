@@ -40,7 +40,7 @@ bool polysort(ArithmeticExpression *left, ArithmeticExpression *right) {
 }
 
 void Tokenize(const string& str, vector<string>& tokens, const string& delimiters = " "){
-    // Skip delimiters at beginning.
+    /*// Skip delimiters at beginning.
     string::size_type lastPos = str.find_first_not_of(delimiters, 0);
     // Find first "non-delimiter".
     string::size_type pos     = str.find_first_of(delimiters, lastPos);
@@ -53,7 +53,19 @@ void Tokenize(const string& str, vector<string>& tokens, const string& delimiter
         lastPos = str.find_first_not_of(delimiters, pos);
         // Find next "non-delimiter"
         pos = str.find_first_of(delimiters, lastPos);
-    }
+    }*/
+	int ebenencount = 0;
+	string::const_iterator lastPos = str.begin();
+	for (string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (*it == '(' || *it == '[' || *it == '{')  ebenencount--;
+		else if (*it == ')' || *it == ']' || *it == '}') ebenencount++;
+		else if (ebenencount == 0 && delimiters.find_first_of(*it) != string::npos) {
+			tokens.push_back(str.substr(lastPos - str.begin(), it - lastPos));
+			lastPos = it + 1;
+		}
+	}
+	if (lastPos != str.begin()) tokens.push_back(str.substr(lastPos - str.begin(), str.length() - (lastPos - str.begin())));
+	else tokens.push_back(str);
 }
 
 ArithmeticExpression *ArithmeticExpression::create(string strin) {
@@ -89,8 +101,8 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 		int pos_multi = 0, pos_divi = 0, pos_potenz = 0;
 
 		for (string::reverse_iterator i = strin.rbegin(); i != strin.rend(); ++i) {
-			if (*i == '(' || *i == '[')  ebenencount--;
-			else if (*i == ')' || *i == ']') ebenencount++;
+			if (*i == '(' || *i == '[' || *i == '{')  ebenencount--;
+			else if (*i == ')' || *i == ']' || *i == '}') ebenencount++;
 			else if (ebenencount == 0) {
 				switch (*i) {
 				case '+':
@@ -118,10 +130,27 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 
 		if (pos_multi) {
 			return new Multiplication(ArithmeticExpression::create(strin.substr(0, pos_multi)), ArithmeticExpression::create(strin.substr(pos_multi + 1, strin.length() - pos_multi - 1)));
-		}else if (pos_divi) {
+		} else if (pos_divi) {
 			return new Division(ArithmeticExpression::create(strin.substr(0, pos_divi)), ArithmeticExpression::create(strin.substr(pos_divi + 1, strin.length() - pos_divi - 1)));
 		} else if (pos_potenz) {
 			return new Exponentiation(ArithmeticExpression::create(strin.substr(0, pos_potenz)), ArithmeticExpression::create(strin.substr(pos_potenz + 1, strin.length() - pos_potenz - 1)));
+		} else if (strin.at(strin.length() - 1) == '}') {
+			int select_ebenencount = 0;
+			string::reverse_iterator itselect;
+			for (itselect = strin.rbegin(); itselect != strin.rend(); ++itselect) {
+				if (*itselect == '(' || *itselect == '[')  select_ebenencount--;
+				else if (*itselect == ')' || *itselect == ']' || *itselect == '}') select_ebenencount++;
+				else if (*itselect == '{') {
+					if (select_ebenencount == 1) break;
+					else select_ebenencount--;
+				}
+			}
+			vector<string> tokens;
+			Tokenize(strin.substr(strin.rend() - itselect, strin.length() - (strin.rend() - itselect) - 1), tokens, ",");
+			if (tokens.size() != 2) throw "Ungueltige Argumentenanzahl fuer Auswahl";
+			else {
+				return new Selection(ArithmeticExpression::create(strin.substr(0, strin.rend() - itselect - 1)), ArithmeticExpression::create(tokens.at(1)), ArithmeticExpression::create(tokens.at(0)));
+			}
 		} else if (strin.substr(0, 5) == "sqrt(") {
 			return new SquareRoot(ArithmeticExpression::create(strin.substr(5, strin.length() - 6)));
 		} else if (strin.substr(0, 4) == "log(") {
@@ -197,13 +226,30 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 	}
 
 	NumericalValue *np;
+	Matrix *mp;
 	double dbuf = 0;
+	vector<Matrix*> matrvec;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
 		if (np = dynamic_cast<NumericalValue*>(*it)) {
 			it = tmpvec.erase(it);
 			dbuf += np->value;
+		} else if (mp = dynamic_cast<Matrix*>(*it)) {
+			vector<Matrix*>::iterator it_mat;
+			for (it_mat = matrvec.begin(); it_mat != matrvec.end(); ++it_mat) {
+				if ((*it_mat)->size_x == mp->size_x && (*it_mat)->size_y == mp->size_y) {
+					for (int i = 0; i < mp->size_y; i++)
+						for (int j = 0; j < mp->size_x; j++)
+							(*it_mat)->components[i][j] = new Addition((*it_mat)->components[i][j], mp->components[i][j]); 
+					break;
+				}
+			}
+			if (it_mat == matrvec.end()) matrvec.push_back(mp);
+			it = tmpvec.erase(it);
 		} else ++it;
 	}
+
+	for (vector<Matrix*>::iterator it_mat = matrvec.begin(); it_mat != matrvec.end(); ++it_mat)
+		tmpvec.push_back((*it_mat)->expand(ei)); //hier expand?
 
 	if (tmpvec.size() == 0) return new NumericalValue(dbuf);
 	else if (dbuf == 0) {
@@ -284,7 +330,7 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
-	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
+	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
 		if (np = dynamic_cast<NumericalValue*>(*it)) {
 			it = tmpvec.erase(it);
 			dbuf *= np->value;
@@ -825,6 +871,21 @@ ArithmeticExpression *Solver::expand(const ExpansionInformation &ei) const {
 bool Solver::isEqual(ArithmeticExpression *other) const {
 	Solver *sp = dynamic_cast<Solver*>(other);
 	return sp && sp->matrix->isEqual(matrix);
+}
+
+ArithmeticExpression *Selection::expand(const ExpansionInformation &ei) const {
+	Matrix *mp = dynamic_cast<Matrix*>(expression->expand(ei));
+	NumericalValue *np_x = dynamic_cast<NumericalValue*>(select_x), *np_y = dynamic_cast<NumericalValue*>(select_y);
+	if (! mp) throw "Es koennen nur Matrixkomponenten ausgewaehlt werden";
+	else if (! (np_x && np_y)) throw "Argumente fuer Auswahl muessen ganze Zahlen sein"; //ganze Zahl vs DecimalRec
+	else if (mp->size_x < np_x->value || mp->size_y < np_y->value) throw "Komponente kann nicht aus Matrix gewaehlt werden";
+	else return mp->components[(int)np_y->value - 1][(int)np_x->value - 1]->expand(ei);
+
+}
+
+bool Selection::isEqual(ArithmeticExpression *other) const {
+	Selection *sp = dynamic_cast<Selection*>(other);
+	return (sp && sp->expression->isEqual(expression) && sp->select_x->isEqual(select_x) && sp->select_y->isEqual(select_y));
 }
 
 string Command::getString() const {

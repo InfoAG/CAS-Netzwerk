@@ -226,13 +226,30 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 	}
 
 	NumericalValue *np;
+	Matrix *mp;
 	double dbuf = 0;
+	vector<Matrix*> matrvec;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
 		if (np = dynamic_cast<NumericalValue*>(*it)) {
 			it = tmpvec.erase(it);
 			dbuf += np->value;
+		} else if (mp = dynamic_cast<Matrix*>(*it)) {
+			vector<Matrix*>::iterator it_mat;
+			for (it_mat = matrvec.begin(); it_mat != matrvec.end(); ++it_mat) {
+				if ((*it_mat)->size_x == mp->size_x && (*it_mat)->size_y == mp->size_y) {
+					for (int i = 0; i < mp->size_y; i++)
+						for (int j = 0; j < mp->size_x; j++)
+							(*it_mat)->components[i][j] = new Addition((*it_mat)->components[i][j], mp->components[i][j]); 
+					break;
+				}
+			}
+			if (it_mat == matrvec.end()) matrvec.push_back(mp);
+			it = tmpvec.erase(it);
 		} else ++it;
 	}
+
+	for (vector<Matrix*>::iterator it_mat = matrvec.begin(); it_mat != matrvec.end(); ++it_mat)
+		tmpvec.push_back((*it_mat)->expand(ei)); //hier expand?
 
 	if (tmpvec.size() == 0) return new NumericalValue(dbuf);
 	else if (dbuf == 0) {
@@ -313,7 +330,7 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
-	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) {
+	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
 		if (np = dynamic_cast<NumericalValue*>(*it)) {
 			it = tmpvec.erase(it);
 			dbuf *= np->value;

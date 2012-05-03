@@ -196,14 +196,18 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
 			if (pos_leftparenth == string::npos || strin.at(strin.length() - 1) != ')' || ! IdentifierRec::runWith(funcname)) throw "Ungueltiger (Teil-)Term";
-			string funcargs = strin.substr(pos_leftparenth + 1, strin.length() - pos_leftparenth - 2);
+			/*string funcargs = strin.substr(pos_leftparenth + 1, strin.length() - pos_leftparenth - 2);
 			int pos_before = -1, pos_now = 0;
 			vector<ArithmeticExpression*> argvec;
 			while ((pos_now = funcargs.find(',', pos_before + 1)) != string::npos) {
 				argvec.push_back(ArithmeticExpression::create(funcargs.substr(pos_before + 1, pos_now - pos_before - 1)));
 				pos_before = pos_now;
 			}
-			argvec.push_back(ArithmeticExpression::create(funcargs.substr(pos_before + 1, funcargs.length() - pos_before - 1)));
+			argvec.push_back(ArithmeticExpression::create(funcargs.substr(pos_before + 1, funcargs.length() - pos_before - 1)));*/
+			vector<string> tokens;
+			Tokenize(strin.substr(pos_leftparenth + 1, strin.length() - pos_leftparenth - 2), tokens, ",");
+			vector<ArithmeticExpression*> argvec;
+			for (vector<string>::iterator it = tokens.begin(); it != tokens.end(); ++it) argvec.push_back(ArithmeticExpression::create(*it));
 			return new FunctionExpression(funcname, argvec);
 		}
 	}

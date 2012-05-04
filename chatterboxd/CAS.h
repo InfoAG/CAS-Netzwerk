@@ -6,6 +6,7 @@
 #include <list>
 #include <algorithm>
 #include <sstream>
+#include <map>
 
 using namespace std;
 
@@ -107,7 +108,7 @@ struct Subtraction : public BinaryOperation {
 	virtual string getString() const;
 };
 struct Multiplication : public LevelingOperation {
-	void addexp(ArithmeticExpression*, ArithmeticExpression*, vector<Exponentiation*>&) const;
+	void addexp(ArithmeticExpression*, ArithmeticExpression*, vector<Exponentiation*>&, const ExpansionInformation&) const;
 	Multiplication(const list<ArithmeticExpression*>& va) : LevelingOperation(va) {};
 	virtual ArithmeticExpression *copy() const { return new Multiplication(*this); };
 	Multiplication(ArithmeticExpression *l, ArithmeticExpression *r) : LevelingOperation(l, r) {};

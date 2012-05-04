@@ -66,6 +66,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void portReturnPressed();
 
         void cHistRequested(QKeyEvent*);
+        void scopeInfo_itemClicked(QListWidgetItem*);
 
         bool eventFilter(QObject *, QEvent *);
     private:

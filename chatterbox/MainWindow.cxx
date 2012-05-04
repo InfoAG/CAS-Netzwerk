@@ -45,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(userLineEdit, SIGNAL(textChanged(QString)), this, SLOT(anyTextChanged(QString)));
     connect(scopeListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
     connect(scopeListWidget, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(itemChanged(QListWidgetItem*)));
+    connect(functionListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(scopeInfo_itemClicked(QListWidgetItem*)));
+    connect(variableListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(scopeInfo_itemClicked(QListWidgetItem*)));
+    connect(commandListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(scopeInfo_itemClicked(QListWidgetItem*)));
 
 #ifdef AUTOCONNECT
     serverLineEdit->setText("localhost");
@@ -305,6 +308,11 @@ void MainWindow::cHistRequested(QKeyEvent *e)
     QTextCursor cursor = sayTextEdit->textCursor();
     cursor.movePosition(QTextCursor::End);
     sayTextEdit->setTextCursor(cursor);
+}
+
+void MainWindow::scopeInfo_itemClicked(QListWidgetItem *item)
+{
+    sayTextEdit->setText(sayTextEdit->toPlainText() + item->text());
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)

@@ -283,11 +283,11 @@ ArithmeticExpression *Subtraction::expand(const ExpansionInformation& ei) const 
 	return Addition(left, new Multiplication(new NumericalValue(-1), right)).expand(ei);
 }
 
-void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *potency, vector<Exponentiation*>& exvec) const {
+void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *potency, vector<Exponentiation*>& exvec, const ExpansionInformation& ei) const {
 	vector<Exponentiation*>::iterator it;
 	for (it = exvec.begin(); it != exvec.end(); ++it) {
 		if ((*it)->left->isEqual(base)) {
-			(*it)->right = new Addition((*it)->right, potency);
+			(*it)->right = Addition((*it)->right, potency).expand(ei);
 			break;
 		}
 	}
@@ -327,12 +327,12 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 	vector<Exponentiation*> exvec;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end(); ++it) {
 		exp = dynamic_cast<Exponentiation*>(*it);
-		if (exp) addexp(exp->left, exp->right, exvec);
-		else addexp(*it, new NumericalValue(1), exvec);
+		if (exp) addexp(exp->left, exp->right, exvec, ei);
+		else addexp(*it, new NumericalValue(1), exvec, ei);
 	} 
 	tmpvec.clear();
 	for (vector<Exponentiation*>::iterator it = exvec.begin(); it != exvec.end(); ++it)
-		tmpvec.push_back((*it)->expand(ExpansionInformation(ei.variables, ei.functions, ei.commands))); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
+		tmpvec.push_back(*it); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
@@ -341,6 +341,37 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 			dbuf *= np->value;
 		} else ++it;
 	}
+	Matrix *mp;
+	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
+		if (mp = dynamic_cast<Matrix*>(*it)) {
+			for (int i = 0; i < mp->size_y; i++)
+				for (int j = 0; j < mp->size_x; j++)
+					mp->components[i][j] = Multiplication(mp->components[i][j], new NumericalValue(dbuf)).expand(ei);
+			dbuf = 1;
+			break;
+		} else ++it;
+	}
+	/*NumericalValue *np;
+	Matrix *mp;
+	map<int, Matrix*> matrvec;
+	map<int, Matrix*>::iterator it_vec;
+	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
+		if (np = dynamic_cast<NumericalValue*>(*it)) {
+			it_vec = matrvec.find(1);
+			ArithmeticExpression ***c = new ArithmeticExpression**[1];
+			if (it_vec != matrvec.end()) {
+				c[1] = new ArithmeticExpression*[it_vec->second->size_x];
+				for (int i = 0; i < 
+			} else {
+				c[1] = new ArithmeticExpression*[1];
+				c[1][1] = np;
+				matrvec.insert(pair<int, Matrix*>(1, new Matrix(c, 1, 1)));
+			}
+			it = tmpvec.erase(it);
+		} else if (mp = dynamic_cast<Matrix*>(*it)) {
+			
+		} else ++it;
+	}*/
 	if (dbuf == 0) return new NumericalValue(0);
 	else if (tmpvec.size() == 0) return new NumericalValue(dbuf);
 	else if (dbuf == 1) {
@@ -468,12 +499,17 @@ ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) con
 	NumericalValue *nl = dynamic_cast<NumericalValue*>(al);
 	NumericalValue *nr = dynamic_cast<NumericalValue*>(ar);
 	if (nl && nr) return new NumericalValue(pow(nl->value,  nr->value));
+	else if (nl && nl->value == 1) return al;
 	else if (nr) {
 		if (nr->value == 0) return new NumericalValue(1);
 		else if (nr->value == 1) return al;
-	}
-	if (nl && nl->value == 1) return al;
-	return new Exponentiation(al, ar);
+		else {
+			list<ArithmeticExpression*> multis;
+			for (int i = 0; i < nr->value; i++) multis.push_back(al);
+			return Multiplication(multis).expand(ei);
+		}
+	} else return new Exponentiation(al, ar);
+	
 }
 
 ArithmeticExpression *SquareRoot::expand(const ExpansionInformation& ei) const {
@@ -834,9 +870,9 @@ string Matrix::getString() const {
 bool Matrix::isEqual(ArithmeticExpression *other) const {
 	Matrix *mp = dynamic_cast<Matrix*>(other);
 	if (! mp || size_x != mp->size_x || size_y != mp->size_y) return false;
-	for (int i = 0; i < size_x; i++) {
-		for (int j = 0; j < size_y; j++) {
-			if (components[i][j] != mp->components[i][j]) return false;
+	for (int i = 0; i < size_y; i++) {
+		for (int j = 0; j < size_x; j++) {
+			if (! components[i][j]->isEqual(mp->components[i][j])) return false;
 		}
 	}
 	return true;

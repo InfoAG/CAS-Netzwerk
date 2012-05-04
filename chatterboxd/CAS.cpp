@@ -283,11 +283,11 @@ ArithmeticExpression *Subtraction::expand(const ExpansionInformation& ei) const 
 	return Addition(left, new Multiplication(new NumericalValue(-1), right)).expand(ei);
 }
 
-void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *potency, vector<Exponentiation*>& exvec, const ExpansionInformation& ei) const {
+void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *potency, vector<Exponentiation*>& exvec) const {
 	vector<Exponentiation*>::iterator it;
 	for (it = exvec.begin(); it != exvec.end(); ++it) {
 		if ((*it)->left->isEqual(base)) {
-			(*it)->right = Addition((*it)->right, potency).expand(ei);
+			(*it)->right = new Addition((*it)->right, potency);
 			break;
 		}
 	}
@@ -327,12 +327,12 @@ ArithmeticExpression *Multiplication::expand(const ExpansionInformation& ei) con
 	vector<Exponentiation*> exvec;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end(); ++it) {
 		exp = dynamic_cast<Exponentiation*>(*it);
-		if (exp) addexp(exp->left, exp->right, exvec, ei);
-		else addexp(*it, new NumericalValue(1), exvec, ei);
+		if (exp) addexp(exp->left, exp->right, exvec);
+		else addexp(*it, new NumericalValue(1), exvec);
 	} 
 	tmpvec.clear();
 	for (vector<Exponentiation*>::iterator it = exvec.begin(); it != exvec.end(); ++it)
-		tmpvec.push_back(*it); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
+		tmpvec.push_back((*it)->expand(ei)); //nicht expand?? für hoch1, oder exponent-expand ändern (aber endergebnis)
 	NumericalValue *np;
 	double dbuf = 1;
 	for (list<ArithmeticExpression*>::iterator it = tmpvec.begin(); it != tmpvec.end();) { //hier matrix
@@ -503,12 +503,13 @@ ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) con
 	else if (nr) {
 		if (nr->value == 0) return new NumericalValue(1);
 		else if (nr->value == 1) return al;
-		else {
+/*		else {
 			list<ArithmeticExpression*> multis;
 			for (int i = 0; i < nr->value; i++) multis.push_back(al);
 			return Multiplication(multis).expand(ei);
-		}
-	} else return new Exponentiation(al, ar);
+		}*/
+	}
+	return new Exponentiation(al, ar);
 	
 }
 

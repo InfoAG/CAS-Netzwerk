@@ -3,7 +3,8 @@
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument* document):QSyntaxHighlighter(document)
 {
     format.setFontWeight(QFont::Bold);
-    format.setBackground(Qt::cyan);
+    const QColor qtGreen(102, 176, 54);
+    format.setBackground(qtGreen);
     QFont hlFont = format.font();
     format.setFont(hlFont);
 }

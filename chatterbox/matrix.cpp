@@ -1,8 +1,13 @@
 #include "matrix.h"
 
-matrix::matrix(QWidget *parent) :
-    QDialog(parent, Qt::FramelessWindowHint)
+matrix::matrix(QWidget *parent, QPoint initial_pos) :
+    QDialog(0, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
 {
+    this->current_pos = initial_pos;
+    //this->setModal(false);
+    //this->move(this->mapFromGlobal(initial_pos).x(), this->mapFromGlobal(initial_pos).y());
+    this->move(initial_pos.x()-80,initial_pos.y()-330);
+    qDebug() << this->height();
     QPushButton* accepted_button = new QPushButton;
     accepted_button->setText(tr("Ok"));
     accepted_button->setDefault(true);
@@ -12,65 +17,95 @@ matrix::matrix(QWidget *parent) :
     button_layout->addWidget(accepted_button);
     button_layout->addWidget(quit_button);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    //achtung unschoener programmierstil
+    //textedit = new QTextEdit;
+    textedit  =static_cast<QTextEdit*>(parent);
+    connect(textedit,SIGNAL(textChanged()),this,SLOT(moveAnimation()));
+
+    mainLayout = new QVBoxLayout;
     tblv = new QTableView();
-    installEventFilter(this);
+    //installEventFilter(this);
 
     mainLayout->addWidget(tblv);
     mainLayout->addLayout(button_layout);
+    mainLayout->addSpacerItem(new QSpacerItem(0, 33, QSizePolicy::Maximum, QSizePolicy::Maximum));
     setLayout(mainLayout);
 
-    model = new QStandardItemModel(2, 2, this);
-    //model->setHorizontalHeaderItem(0, new QStandardItem(QString("1")));
-    //model->setHorizontalHeaderItem(1,new QStandardItem(QString("2")));
-    QStandardItem* item = new QStandardItem(QString("[Arrow Right]"));
-    item->setSelectable(false);
-    model->setItem(0, 0,new QStandardItem());
-    model->setItem(0, 1, item);
-    model->setItem(1, 0, new QStandardItem(QString("[Arrow Down]")));
+    model = new QStandardItemModel(1,1,this);
+
+    model->setItem(0, 0, new QStandardItem(QString("asgsdga")));
 
     tblv->setModel(model);
 
-    //setAttribute( Qt::WA_TranslucentBackground, true);
     connect(quit_button,SIGNAL(clicked()),this,SLOT(reject()));
 
-    //setStyleSheet("matrix {background-color: black; border-radius: 5px; border-color: black; border-width: 2px; border-style: outset; padding-top: 2px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px}");
 
-    //setStyleSheet("matrix {border-width: 5px; border-style: inset; border-color: grey; border-radius: 9px; background: black; color: blue; selection-background-color: ltblue;}");
-
-    //setStyleSheet("matrix {background-color: black; border-style: outset; border-width: 10px; border-radius: 20px; border-color: white; font: bold 14px; min-width: 10em; padding: 6px}");
-
-
-    //this->setMask(roundedRect(tblv->rect(), 10));
-
-
-    QPixmap pixmap(this->sizeHint());
+    /*QPixmap pixmap(this->sizeHint());
     QPainter painter(&pixmap);
     painter.fillRect(pixmap.rect(), Qt::white);
     painter.setBrush(Qt::black);
     painter.drawRoundRect(pixmap.rect());
-    setMask(pixmap.createMaskFromColor(Qt::white));
+    setMask(pixmap.createMaskFromColor(Qt::white));*/
+
+//    tblv->setVisible(false);
+//    tblv->resizeColumnsToContents();
+//    tblv->resizeRowsToContents();
+//    tblv->setVisible(true);
+
+
+    //this->adjustSize();
+
+    //this->setStyleSheet("QWidget{margin-bottom: 40px;}");
+
 }
 
-QSize matrix::sizeHint() const
+void matrix::moveAnimation()
 {
-    return QSize(300, 200);
+    qDebug() << this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft()).x();
+    qDebug() << this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft()).y();
+
+    QPropertyAnimation animation(this, "geometry");
+
+    /*animation.setDuration(10000);
+    //animation.setEasingCurve(QEasingCurve::OutCubic);
+    animation.setStartValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
+
+    //this->current_pos = this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft());
+
+    //animation.setEndValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
+    animation.setEndValue(QRect(0, 0, width(), height()));
+
+
+    animation.start();*/
+
+
+    animation.setDuration(10000);
+     animation.setStartValue(QRect(0, 0, 100, 30));
+     animation.setEndValue(QRect(250, 250, 100, 30));
+
+     animation.start();
+
 }
+
+
+
 
 void matrix::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton) {
+    /*if (event->buttons() & Qt::LeftButton) {
         move(event->globalPos() - m_dragPosition);
         event->accept();
-    }
+    }*/
+    event->ignore();
 }
 
 void matrix::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    /*if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
         event->accept();
-    }
+    }*/
+    event->ignore();
 }
 
 void matrix::paintEvent(QPaintEvent*)
@@ -80,37 +115,44 @@ void matrix::paintEvent(QPaintEvent*)
     const QPoint finalStop(width()/2, height());
     QLinearGradient gradient(start, finalStop);
     const QColor qtGreen(102, 176, 54);
+
     gradient.setColorAt(0, qtGreen.dark());
     gradient.setColorAt(0.5, qtGreen);
     gradient.setColorAt(1, qtGreen.dark());
 
-    QPainter p(this);
-    p.fillRect(0, 0, width(), height(), gradient);
+    QPainter painter(this);
+    painter.fillRect(0, 0, width(), height(), gradient);
 
     QFont headerFont("Sans Serif", 12, QFont::Bold);
     QFont normalFont("Sans Serif", 9, QFont::Normal);
 
-    // draw it twice for shadow effect
-    p.setFont(headerFont);
+    //shadoweffect: draw 2 times
+    painter.setFont(headerFont);
     QRect headerRect(1, 1, width(), 25);
-    p.setPen(Qt::black);
-    //p.drawText(headerRect, Qt::AlignCenter, m_station.name());
+    headerRect.moveTopLeft(QPoint(0, 0)); //go to topleft position 0/0
+    painter.setPen(Qt::white);
+    painter.drawText(headerRect, Qt::AlignCenter, "Matrix"); //and write text in the center
+    painter.setFont(normalFont);
 
-    headerRect.moveTopLeft(QPoint(0, 0));
-    p.setPen(Qt::white);
-    //p.drawText(headerRect, Qt::AlignCenter, m_station.name());
-
-    p.setFont(normalFont);
 }
 
 void matrix::resizeEvent(QResizeEvent*)
 {
+    const QColor qtGreen(102, 176, 54);
+
+    static const QPointF points[3] = {
+             QPointF(100.0, height()- 40),
+             QPointF(150.0, height()- 40),
+            QPointF(80.0, height())
+    };
+
     QBitmap maskBitmap(width(), height());
     maskBitmap.clear();
 
     QPainter p(&maskBitmap);
     p.setBrush(Qt::black);
-    p.drawRoundRect(0, 0, width(), height(), 20, 30);
+    p.drawRoundRect(0, 0, width(), height() - 40, 20, 30);
+    p.drawPolygon(points, 3);
     p.end();
 
     setMask(maskBitmap);
@@ -121,10 +163,20 @@ void matrix::resizeEvent(QResizeEvent*)
 
 void matrix::keyPressEvent(QKeyEvent *e)
 {
-    if(e->key() == Qt::Key_Right)
+    if(e->key() == Qt::Key_Down)
     {
-        qDebug() << "derp";
+        qDebug() << "Du hast einen Pfeil bedient";
 
+        this->model->insertRow(1);
+        this->adjustSize();
+    }
+
+    if(e->key() == Qt::Key_Up)
+    {
+        qDebug() << "Du hast einen anderen Pfeil bedient";
+
+        this->model->insertColumn(1);
+        this->adjustSize();
     }
 
 }
@@ -180,12 +232,16 @@ void matrix::expandModel()
     return matrixstr;
 }*/
 
-QString matrix::MatrixDlg() {
-    matrix MDlg;
-    if (MDlg.exec() == QDialog::Accepted) {
+QString matrix::MatrixDlg(QWidget *parent, QPoint initial_pos) {
+    matrix* MDlg = new matrix(parent, initial_pos);
+    /*if (MDlg.exec() == QDialog::Accepted) {
         return "herp"; //MDlg.getMatrixString();
     }
-    else return QString();
+    else return QString();*/
+
+    MDlg->show();
+
+    return "";
 }
 
 

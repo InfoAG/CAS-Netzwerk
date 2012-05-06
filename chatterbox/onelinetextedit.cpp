@@ -30,9 +30,9 @@ void OneLineTextEdit::keyPressEvent (QKeyEvent *e)
         emit cHistRequested(e);
     } else if (e->text() == "[") {
         QTextEdit::keyPressEvent(e);
-        QString matrixstr = matrix::MatrixDlg();
-        if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();
-        else this->insertPlainText(matrixstr + "]");
+        QString matrixstr = matrix::MatrixDlg(this,this->mapToGlobal(this->cursorRect().bottomLeft()));
+        //if (matrixstr.isEmpty()) this->textCursor().deletePreviousChar();
+        //else this->insertPlainText(matrixstr + "]");
     } else
         QTextEdit::keyPressEvent(e);
 }

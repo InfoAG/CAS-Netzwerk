@@ -310,7 +310,7 @@ struct Transformation : public ArithmeticExpression {
     Transformation(ArithmeticExpression *f, ArithmeticExpression *v_to, ArithmeticExpression *v_fid) : exp(f), var_to(v_to), var_fid(v_fid) {};
     virtual ArithmeticExpression *copy() const { return new Transformation(*this); };
     virtual ArithmeticExpression *expand(const ExpansionInformation&) const;
-    virtual string getString() const { return "transform(" + exp->getString() + "," + var_to->getString() + var_fid->getString() + ")"; };
+    virtual string getString() const { return "transform(" + exp->getString() + "," + var_to->getString() + "," + var_fid->getString() + ")"; };
     virtual bool isEqual(ArithmeticExpression *other) const;
 };
 

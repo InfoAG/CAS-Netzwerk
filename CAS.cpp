@@ -633,7 +633,7 @@ ArithmeticExpression* Addition::formPolynom() const {
 
 ArithmeticExpression *Addition::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const {
     ArithmeticExpression *others = before;
-    ArithmeticExpression *varexp;
+    ArithmeticExpression *varexp = NULL;
     for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
         if ((*it)->containsVar(var_to)) {
             varexp = *it;
@@ -1117,9 +1117,9 @@ ArithmeticExpression *Transformation::expand(const ExpansionInformation &ei) con
 {
     /*FunctionExpression *fp = dynamic_cast<FunctionExpression*>(function);
     if (! fp) throw "Erstes Argument zu transform() muss Funktion sein.";*/
-    VariableExpression *vp_to = dynamic_cast<VariableExpression*>(var_to->expand(ei));
+    VariableExpression *vp_to = dynamic_cast<VariableExpression*>(var_to);
     if (! vp_to) throw "Zweites Argument zu transform() muss Variable sein.";
-    VariableExpression *vp_fid = dynamic_cast<VariableExpression*>(var_fid->expand(ei));
+    VariableExpression *vp_fid = dynamic_cast<VariableExpression*>(var_fid);
     if (! vp_fid) throw "Drittes Argument zu transform() muss Variable sein.";
 
     //Path p = exp->getVarPath(vp_to->identifier);

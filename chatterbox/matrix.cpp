@@ -64,26 +64,17 @@ void matrix::moveAnimation()
     qDebug() << this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft()).x();
     qDebug() << this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft()).y();
 
-    QPropertyAnimation animation(this, "geometry");
+    QPropertyAnimation* animation = new QPropertyAnimation(this, "geometry");
 
-    /*animation.setDuration(10000);
-    //animation.setEasingCurve(QEasingCurve::OutCubic);
-    animation.setStartValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
+    animation->setDuration(1000);
+    animation->setEasingCurve(QEasingCurve::OutCubic);
+    animation->setStartValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
 
-    //this->current_pos = this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft());
+    this->current_pos = this->textedit->mapToGlobal(this->textedit->cursorRect().bottomLeft());
 
-    //animation.setEndValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
-    animation.setEndValue(QRect(0, 0, width(), height()));
+    animation->setEndValue(QRect(this->current_pos.x()-80, this->current_pos.y()-330, width(), height()));
 
-
-    animation.start();*/
-
-
-    animation.setDuration(10000);
-     animation.setStartValue(QRect(0, 0, 100, 30));
-     animation.setEndValue(QRect(250, 250, 100, 30));
-
-     animation.start();
+    animation->start();
 
 }
 

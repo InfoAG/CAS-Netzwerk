@@ -11,7 +11,7 @@ class matrix : public QDialog
 {
     Q_OBJECT
 public:
-    matrix(QWidget *parent = 0, QPoint initial_pos =0);
+    matrix(QWidget *parent = 0, QPoint initial_pos =QPoint(0,0));
     //QString getMatrixString() const;
     static QString MatrixDlg(QWidget *parent, QPoint initial_pos);
 

@@ -166,7 +166,7 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			return new Tangent(ArithmeticExpression::create(strin.substr(4, strin.length() - 5)));
 		} else if (strin.substr(0, 10) == "integrate(") {
 			vector<string> tokens;
-			Tokenize(strin.substr(10, strin.length() - 11), tokens, ","); //ALEX FUNCKOMMAS!!!!!!!
+            Tokenize(strin.substr(10, strin.length() - 11), tokens, ","); //ALEX FUNCKOMMAS!!!!!!! NACHHER CHEKC?
 			if (tokens.size() != 5 || ! IdentifierRec::runWith(tokens.at(1)) || ! DecimalRec::runWith(tokens.at(2)) || ! DecimalRec::runWith(tokens.at(3)) || ! DecimalRec::runWith(tokens.at(4))) throw "Ungueltiger (Teil-)Term"; //UND HIER AUCH
 			return new Integral(ArithmeticExpression::create(tokens.at(0)), new VariableExpression(tokens.at(1)), strtod(tokens.at(2).c_str(), NULL), strtod(tokens.at(3).c_str(), NULL), strtod(tokens.at(4).c_str(), NULL));
 		} else if (strin.at(0) == '$' && DecimalRec::runWith(strin.substr(1, strin.length() - 1))) { //!!!!!!ALEX GUCK HIER
@@ -192,6 +192,10 @@ ArithmeticExpression *ArithmeticExpression::create(string strin) {
 			return new Matrix(c, size_x, tokens.size());
 		} else if (strin.substr(0, 6) == "solve(") {
 			return new Solver(ArithmeticExpression::create(strin.substr(6, strin.length() - 7)));
+        } else if (strin.substr(0, 10) == "transform(") {
+            vector<string> tokens;
+            Tokenize(strin.substr(10, strin.length() - 11), tokens, ",");
+            return new Transformation(ArithmeticExpression::create(tokens.at(0)), ArithmeticExpression::create(tokens.at(1)), ArithmeticExpression::create(tokens.at(2)));
 		} else {
 			size_t pos_leftparenth = strin.find_first_of('(');
 			string funcname = strin.substr(0, pos_leftparenth);
@@ -280,7 +284,13 @@ ArithmeticExpression *Addition::expand(const ExpansionInformation& ei) const {
 }
 
 ArithmeticExpression *Subtraction::expand(const ExpansionInformation& ei) const {
-	return Addition(left, new Multiplication(new NumericalValue(-1), right)).expand(ei);
+    return Addition(left, new Multiplication(new NumericalValue(-1), right)).expand(ei);
+}
+
+ArithmeticExpression *Subtraction::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const
+{
+    if (left->containsVar(var_to)) return left->transformExpression(var_to, new Addition(before, right));
+    else return right->transformExpression(var_to, new Multiplication(new NumericalValue(-1), new Subtraction(before, left)));
 }
 
 void Multiplication::addexp(ArithmeticExpression *base, ArithmeticExpression *potency, vector<Exponentiation*>& exvec) const {
@@ -490,7 +500,13 @@ ArithmeticExpression *Division::expand(const ExpansionInformation& ei) const {
 			}
 		}
 		return Multiplication(reslist).expand(ei);*/
-	}
+    }
+}
+
+ArithmeticExpression *Division::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const
+{
+    if (left->containsVar(var_to)) return left->transformExpression(var_to, new Multiplication(before, right));
+    else return right->transformExpression(var_to, new Multiplication(new Division(new NumericalValue(1), before), left));
 }
 
 ArithmeticExpression *Exponentiation::expand(const ExpansionInformation& ei) const {
@@ -580,7 +596,13 @@ ArithmeticExpression *VariableExpression::expand(const ExpansionInformation& ei)
 			}
 	}
 
-	return new VariableExpression(identifier);
+    return new VariableExpression(identifier);
+}
+
+ArithmeticExpression *VariableExpression::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const
+{
+    if (var_to->identifier == identifier) return before;
+    else throw "Transform-Fehler";
 }
 
 ArithmeticExpression *CommandExpression::expand(const ExpansionInformation& ei) const {
@@ -606,7 +628,18 @@ ArithmeticExpression* Addition::formPolynom() const {
 		if (mp = dynamic_cast<Multiplication*>(ax)) newlist.push_back(ax);
 		else newlist.push_back(Multiplication(new NumericalValue(1), ax).formPolynom());
 	}
-	return new Addition(newlist);
+    return new Addition(newlist);
+}
+
+ArithmeticExpression *Addition::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const {
+    ArithmeticExpression *others = before;
+    ArithmeticExpression *varexp = NULL;
+    for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
+        if ((*it)->containsVar(var_to)) {
+            varexp = *it;
+        } else others = new Subtraction(others, *it);
+    }
+    return varexp->transformExpression(var_to, others);
 }
 
 ArithmeticExpression* Multiplication::formPolynom() const {
@@ -645,7 +678,19 @@ Multiplication *Multiplication::formMonom() const {
 		list<ArithmeticExpression*> clist(operands);
 		clist.push_front(new NumericalValue(1));
 		return new Multiplication(clist);
-	} else return new Multiplication(operands);
+    } else return new Multiplication(operands);
+}
+
+ArithmeticExpression *Multiplication::transformExpression(VariableExpression *var_to, ArithmeticExpression *before) const
+{
+    list<ArithmeticExpression*> others;
+    ArithmeticExpression *varexp;
+    for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it) {
+        if ((*it)->containsVar(var_to)) {
+            varexp = *it;
+        } else others.push_back((*it)->copy());
+    }
+    return varexp->transformExpression(var_to, new Division(before, new Multiplication(others)));
 }
 
 string CommandExpression::getString() const {
@@ -742,7 +787,14 @@ string FunctionExpression::getString() const {
 bool LevelingOperation::isEqual(ArithmeticExpression *other) const {
 	LevelingOperation *ap = dynamic_cast<LevelingOperation*>(other);
 	if (ap) return compareOperands(operands, ap->operands);
-	else return false;
+    else return false;
+}
+
+bool LevelingOperation::containsVar(VariableExpression *var) const
+{
+    for (list<ArithmeticExpression*>::const_iterator it = operands.begin(); it != operands.end(); ++it)
+        if ((*it)->containsVar(var)) return true;
+    return false;
 }
 
 bool BinaryOperation::isEqual(ArithmeticExpression *other) const {
@@ -1058,5 +1110,25 @@ void CAS::reset() {
 	casinfo.commands.clear();
 	VariablesModified = true;
 	FunctionsModified = true;
-	CommandsModified = true;
+    CommandsModified = true;
+}
+
+ArithmeticExpression *Transformation::expand(const ExpansionInformation &ei) const
+{
+    /*FunctionExpression *fp = dynamic_cast<FunctionExpression*>(function);
+    if (! fp) throw "Erstes Argument zu transform() muss Funktion sein.";*/
+    VariableExpression *vp_to = dynamic_cast<VariableExpression*>(var_to);
+    if (! vp_to) throw "Zweites Argument zu transform() muss Variable sein.";
+    VariableExpression *vp_fid = dynamic_cast<VariableExpression*>(var_fid);
+    if (! vp_fid) throw "Drittes Argument zu transform() muss Variable sein.";
+
+    //Path p = exp->getVarPath(vp_to->identifier);
+
+    return exp->transformExpression(vp_to, vp_fid)->expand(ei);
+}
+
+bool Transformation::isEqual(ArithmeticExpression *other) const
+{
+    Transformation *tp = dynamic_cast<Transformation*>(other);
+    return (tp && tp->exp->isEqual(exp) && tp->var_to->isEqual(var_to) && tp->var_fid->isEqual(var_fid));
 }
